@@ -1,0 +1,2 @@
+Dentro de authentication, tem que rodar node patient/createTable.js
+Só pra criar o banco de dados (ainda tá ultra mega básico, logicamente, foi mais pra testar mesmo e ver como é)
