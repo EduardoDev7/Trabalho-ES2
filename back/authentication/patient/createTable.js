@@ -1,4 +1,4 @@
-const RegisterBase = require('better-sqlite3'); //para acessar SQLite
+const RegisterBase = require('better-sqlite3'); //para acessar SQLite 
 const fileTool = require('fs'); //para manipular arquivos
 const path = require('path'); // para montar caminhos
 require('dotenv').config({ path: path.join(__dirname, 'register.env') });
