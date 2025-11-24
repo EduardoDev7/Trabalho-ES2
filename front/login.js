@@ -20,7 +20,7 @@ document.querySelector('form').addEventListener('submit', async function(event) 
     try {
         // 3. e 4. Envia os dados para o Back-end
         // ONDE ESTÁ "http://localhost:3000/login", VOCÊ VAI TROCAR PELA URL DO SEU COLEGA
-        const response = await fetch('http://localhost:3000/login', {
+        const response = await fetch('https://expert-space-halibut-j6w444r6xgpfjjjx-3000.app.github.dev/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -36,7 +36,7 @@ document.querySelector('form').addEventListener('submit', async function(event) 
             const data = await response.json();
             // Sucesso: Salva o token (se houver) e redireciona
             console.log('Login realizado:', data);
-            alert('Login realizado com sucesso!');
+            alert(`Login realizado com sucesso, ${data.name}!`);
             
             
             // window.location.href = 'dashboard.html';

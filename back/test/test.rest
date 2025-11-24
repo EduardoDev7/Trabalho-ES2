@@ -1,0 +1,21 @@
+POST https://expert-space-halibut-j6w444r6xgpfjjjx-3000.app.github.dev/login
+Content-Type: application/json
+
+{
+  "email": "teste3@example.com",
+  "password": "123"
+}
+
+# POST https://expert-space-halibut-j6w444r6xgpfjjjx-3000.app.github.dev/register
+# Content-Type: application/json
+
+# {
+#   "email": "teste3@example.com",
+#   "password": "123",
+#   "name": "Fulaninho"
+# }
+
+# teste@example.com - 123456
+# teste1@example.com - 123456
+# teste2@example.com - 1234
+
