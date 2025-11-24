@@ -3,7 +3,7 @@ const fileTool = require('fs'); //para manipular arquivos
 const path = require('path'); // para montar caminhos
 require('dotenv').config({ path: path.join(__dirname, 'register.env') });
 
-const regFile = process.env.DATABASE_FILE || path.join(__dirname, '..', 'data', 'patients.db');
+const regFile = process.env.DATABASE_FILE || path.join(__dirname, '..','patient', 'data', 'patients.db');
 const regDir = path.dirname(regFile);
 
 // cria a pasta se não existir
