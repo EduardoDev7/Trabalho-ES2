@@ -13,7 +13,7 @@ db.pragma("foreign_keys = ON");
 //crud da tabela meal_log.
 class MealLogRepository {
 
-    // --- CREATE 
+    //CREATE 
     static create(patient_id, description, carbs, date) {
         const stmt = db.prepare(`
             INSERT INTO meal_log (patient_id, description, carbs, date)
