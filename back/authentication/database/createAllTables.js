@@ -77,16 +77,6 @@ CREATE TABLE IF NOT EXISTS patient_challenge (
   FOREIGN KEY (challenge_id) REFERENCES challenge(id)
 );
 
-CREATE TABLE IF NOT EXISTS message (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  doctor_id INTEGER,
-  patient_id INTEGER,
-  content TEXT NOT NULL,
-  timestamp TEXT DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (doctor_id) REFERENCES doctor(id),
-  FOREIGN KEY (patient_id) REFERENCES patient(id)
-);
-
 `);
 
 console.log("Banco criado!");
