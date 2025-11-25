@@ -17,6 +17,13 @@ db.pragma("foreign_keys = ON");
 // cria todas as tabelas do sistema
 db.exec(`
 
+CREATE TABLE IF NOT EXISTS patient (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  email TEXT NOT NULL UNIQUE,
+  password TEXT NOT NULL,
+  name TEXT
+);
+
 CREATE TABLE IF NOT EXISTS doctor (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
