@@ -1,26 +1,22 @@
 document.querySelector('form').addEventListener('submit', async function(event) {
-    event.preventDefault(); // 1. Impede o recarregamento da página
+    event.preventDefault();
 
-    // 2. Captura os dados dos inputs
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     const submitButton = this.querySelector('button[type="submit"]');
 
-    // Validação simples no front antes de enviar
     if (!email || !password) {
         alert('Por favor, preencha todos os campos!');
         return;
     }
 
-    // Muda o texto do botão para dar feedback ao usuário
     const textoOriginal = submitButton.innerText;
-    submitButton.innerText = 'Entrando...';
+    submitButton.innerText = 'Conectando...';
     submitButton.disabled = true;
 
     try {
-        // 3. e 4. Envia os dados para o Back-end
-        // ONDE ESTÁ "http://localhost:3000/login", VOCÊ VAI TROCAR PELA URL DO SEU COLEGA
-        const response = await fetch('https://expert-space-halibut-j6w444r6xgpfjjjx-3000.app.github.dev/login', {
+        // AQUI ESTÁ O SEGREDO: Usar localhost em vez da URL do github
+        const response = await fetch('http://localhost:3000/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -31,25 +27,26 @@ document.querySelector('form').addEventListener('submit', async function(event) 
             })
         });
 
-        // 5. Lida com a resposta
         if (response.ok) {
             const data = await response.json();
-            // Sucesso: Salva o token (se houver) e redireciona
-            console.log('Login realizado:', data);
-            alert(`Login realizado com sucesso, ${data.name}!`);
             
+            // Salva o token real vindo do banco de dados
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('userName', data.name);
             
-            // window.location.href = 'dashboard.html';
+            console.log('Login Realizado:', data);
+            
+            // Redireciona para a dashboard
+            window.location.href = 'dashboard.html';
         } else {
-            // Erro: Senha errada ou usuário não encontrado
-            alert('Erro: E-mail ou senha incorretos.');
+            const errorData = await response.json();
+            alert('Erro: ' + (errorData.error || 'Email ou senha incorretos'));
         }
 
     } catch (error) {
-        console.error('Erro na requisição:', error);
-        alert('Erro de conexão com o servidor.');
+        console.error('Erro:', error);
+        alert('Erro de conexão! Verifique se o servidor (backend) está rodando no terminal.');
     } finally {
-        // Restaura o botão
         submitButton.innerText = textoOriginal;
         submitButton.disabled = false;
     }
