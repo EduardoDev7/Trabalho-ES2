@@ -1,3 +1,5 @@
+// [CreateAllTables.js]
+
 const Database = require("better-sqlite3");
 const fs = require("fs");
 const path = require("path");
@@ -84,6 +86,47 @@ CREATE TABLE IF NOT EXISTS patient_challenge (
   FOREIGN KEY (challenge_id) REFERENCES challenge(id)
 );
 
+-- NOVAS TABELAS PARA ROTINAS DE REFEIÇÃO (Definição da Rotina)
+CREATE TABLE IF NOT EXISTS patient_meal_routine (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  patient_id INTEGER NOT NULL,
+  description TEXT NOT NULL, -- Ex: "Café da Manhã balanceado"
+  carbs INTEGER, -- Meta de carboidratos
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (patient_id) REFERENCES patient(id) ON DELETE CASCADE
+);
+
+-- NOVAS TABELAS PARA O HISTÓRICO DE CONCLUSÃO (O check 'Done' diário)
+CREATE TABLE IF NOT EXISTS meal_routine_completion (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  routine_id INTEGER NOT NULL,
+  patient_id INTEGER NOT NULL,
+  completion_date TEXT NOT NULL, -- Data no formato 'YYYY-MM-DD'
+  UNIQUE (routine_id, completion_date), -- Garante um check por dia por rotina
+  FOREIGN KEY (routine_id) REFERENCES patient_meal_routine(id) ON DELETE CASCADE,
+  FOREIGN KEY (patient_id) REFERENCES patient(id) ON DELETE CASCADE
+);
+
+-- NOVAS TABELAS PARA ROTINAS DE EXERCÍCIO (Definição da Rotina)
+CREATE TABLE IF NOT EXISTS patient_exercise_routine (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  patient_id INTEGER NOT NULL,
+  type TEXT NOT NULL, -- Ex: "Caminhada"
+  duration INTEGER NOT NULL, -- Duração em minutos
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (patient_id) REFERENCES patient(id) ON DELETE CASCADE
+);
+
+-- NOVAS TABELAS PARA O HISTÓRICO DE CONCLUSÃO (O check 'Done' diário)
+CREATE TABLE IF NOT EXISTS exercise_routine_completion (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  routine_id INTEGER NOT NULL,
+  patient_id INTEGER NOT NULL,
+  completion_date TEXT NOT NULL, -- Data no formato 'YYYY-MM-DD'
+  UNIQUE (routine_id, completion_date), -- Garante um check por dia por rotina
+  FOREIGN KEY (routine_id) REFERENCES patient_exercise_routine(id) ON DELETE CASCADE,
+  FOREIGN KEY (patient_id) REFERENCES patient(id) ON DELETE CASCADE
+);
 `);
 
 console.log("Banco criado!");

@@ -17,6 +17,9 @@ app.use('/register', registerRoute);
 const loginRoute = require('./routes/login');
 app.use('/login', loginRoute);
 
+const routineRoute = require('./routes/routine');
+app.use('/api/routines', routineRoute);
+
 // Porta
 const PORT = process.env.PORT || 3000;
 
