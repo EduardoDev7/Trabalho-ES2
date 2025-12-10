@@ -1,6 +1,11 @@
 # Trabalho-ES2
 
-Eduardo Henrique, Maria Clara e Beatriz Aparecida
+Beatriz Aparecida, Eduardo Henrique, Maria Clara.
+
+**Tecnologias**
+
+Front-End : Tailwind, HTML, CSS, JavaScript.
+Back-End: SQLite, Node.js.
 
 **Descrição Geral**
 
