@@ -42,3 +42,9 @@ Pacientes recém-diagnosticados, que buscam orientação estruturada e motivacio
 Profissionais de saúde, como endocrinologistas e nutricionistas, que desejam acompanhar a evolução de seus pacientes por meio de gráficos e registros atualizados.
 
 Clínicas e centros de saúde, que podem integrar o sistema ao processo de marcação de consultas e acompanhamento de pacientes crônicos.
+
+
+**Comandos de Execução**
+
+cd back/authentication       
+node src/server.js 
