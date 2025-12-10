@@ -19,7 +19,7 @@ class ExerciseRoutineRepository {
                 per.id, per.type, per.duration,
                 CASE WHEN erc.completion_date IS NOT NULL THEN 1 ELSE 0 END AS is_done
             FROM patient_exercise_routine per
-            LEFT JOIN exercise_routine_completion erc ON per.id = erc.routine_id AND erc.completion_date = ?
+            LEFT JOIN exercise_routine_completion erc ON per.id = erc.routine_id AND DATE(erc.completion_date) = ?
             WHERE per.patient_id = ?
             ORDER BY per.id ASC;
         `;
