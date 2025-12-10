@@ -1,22 +1,22 @@
 const Database = require('better-sqlite3');
 const path = require('path');
 const fs = require('fs');
-require('dotenv').config({ path: path.join(__dirname, '..', 'patient', 'register.env') });
 
-// Caminho do banco vindo do .env
-const dbFile = process.env.DATABASE_FILE || path.join(__dirname, '..', 'patient', 'data', 'patients.db');
-const dbDir = path.dirname(dbFile);
+// CAMINHO ÚNICO: Aponta para a pasta 'database'
+const dbPath = path.resolve(__dirname, '..', 'database', 'diabetes.db');
+const dbDir = path.dirname(dbPath);
 
-// Cria pasta se não existir
+// Garante que a pasta existe
 if (!fs.existsSync(dbDir)) {
     fs.mkdirSync(dbDir, { recursive: true });
 }
 
-const db = new Database(dbFile);
+const db = new Database(dbPath);
 
-// Configurações recomendadas
+// Ativa chaves estrangeiras para garantir integridade
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
 
-// Exporta a conexão
+console.log(`✅ BANCO ATIVO: ${dbPath}`);
+
 module.exports = db;

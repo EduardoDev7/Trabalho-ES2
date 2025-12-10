@@ -1,201 +1,265 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    // 1. Verificação de Segurança (Bypass simples se não tiver token)
+    // Configuração da API
+    const API_URL = 'http://localhost:3000';
+    const ROUTINE_ENDPOINT = `${API_URL}/api/routines`; // URL correta do server.js
+
     const token = localStorage.getItem('token'); 
-    if (!token) {
-        // Se quiser forçar o login, descomente a linha abaixo:
-        // window.location.href = 'login.html';
-        console.warn("Sem token, rodando em modo visualização.");
-    }
     
-    const userName = localStorage.getItem('userName') || 'Visitante';
+    // Se não tiver token, manda pro login
+    if (!token) {
+        window.location.href = 'login.html';
+        return;
+    }
+
+    const userName = localStorage.getItem('userName') || 'Usuário';
     document.getElementById('userName').innerText = userName;
 
-    // --- DADOS SIMULADOS (MOCK) ---
-    const fakeMeals = [
-        { id: 1, desc: 'Café da manhã: Pão integral + Queijo', carbs: 30, done: false },
-        { id: 2, desc: 'Almoço: Arroz, Feijão e Frango', carbs: 45, done: true },
-        { id: 3, desc: 'Lanche: Fruta', carbs: 15, done: false },
-    ];
+    // Data de hoje formato YYYY-MM-DD
+    const today = new Date().toISOString().split('T')[0];
 
-    const fakeExercises = [
-        { id: 1, type: 'Caminhada leve', duration: '30 min', done: false },
-        { id: 2, type: 'Treino de Força', duration: '45 min', done: true },
-    ];
+    // Listas locais
+    let mealList = [];
+    let exerciseList = [];
 
-    // --- FUNÇÕES VISUAIS E DE LÓGICA ---
+    // --- 1. FUNÇÕES DE API ---
 
-    // Função principal que recalcula tudo (pontos e barra de progresso)
-    function updateDashboardOverview() {
-        const totalMeals = fakeMeals.length;
-        const totalExercises = fakeExercises.length;
-        const totalTasks = totalMeals + totalExercises;
+    async function fetchRoutines() {
+        try {
+            // Busca Refeições
+            const resMeals = await fetch(`${ROUTINE_ENDPOINT}/meal?date=${today}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (resMeals.ok) mealList = await resMeals.json();
 
-        const doneMeals = fakeMeals.filter(m => m.done).length;
-        const doneExercises = fakeExercises.filter(e => e.done).length;
-        const totalDone = doneMeals + doneExercises;
+            // Busca Exercícios
+            const resExercises = await fetch(`${ROUTINE_ENDPOINT}/exercise?date=${today}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (resExercises.ok) exerciseList = await resExercises.json();
 
-        // 1. Atualiza Pontos (Gamificação simples: 150 pts base + 50 por tarefa)
-        const currentPoints = 150 + (totalDone * 50);
-        // Animação simples do número
-        animateValue(document.getElementById('userPoints'), parseInt(document.getElementById('userPoints').innerText), currentPoints, 500);
-
-        // 2. Atualiza Barra de Progresso Real
-        let percentage = 0;
-        if (totalTasks > 0) {
-            percentage = Math.round((totalDone / totalTasks) * 100);
-        }
-
-        const progressBar = document.getElementById('progressBar');
-        const progressText = document.getElementById('progressText');
-
-        // Atualiza largura e texto
-        progressBar.style.width = `${percentage}%`;
-        progressText.innerText = `${percentage}%`;
-
-        // Muda a cor da barra se chegar a 100% (Fica verde)
-        if (percentage === 100) {
-            progressBar.classList.remove('bg-accentPurple');
-            progressBar.classList.add('bg-green-500', 'shadow-[0_0_15px_rgba(34,197,94,0.5)]');
-            progressText.classList.add('text-green-400');
-        } else {
-            progressBar.classList.add('bg-accentPurple');
-            progressBar.classList.remove('bg-green-500', 'shadow-[0_0_15px_rgba(34,197,94,0.5)]');
-            progressText.classList.remove('text-green-400');
+            renderAll();
+        } catch (error) {
+            console.error("Erro ao buscar rotinas:", error);
         }
     }
 
-    // Função auxiliar para animar números (efeito visual legal)
-    function animateValue(obj, start, end, duration) {
-        let startTimestamp = null;
-        const step = (timestamp) => {
-            if (!startTimestamp) startTimestamp = timestamp;
-            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-            obj.innerText = Math.floor(progress * (end - start) + start);
-            if (progress < 1) {
-                window.requestAnimationFrame(step);
+    // Salvar Nova Rotina
+    async function saveRoutine(type, payload) {
+        try {
+            const response = await fetch(`${ROUTINE_ENDPOINT}/${type}`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                alert('Atividade adicionada com sucesso!');
+                closeModal();
+                fetchRoutines(); // Recarrega a lista
+            } else {
+                const err = await response.json();
+                alert('Erro: ' + (err.error || 'Falha ao salvar'));
             }
-        };
-        window.requestAnimationFrame(step);
+        } catch (error) {
+            console.error("Erro ao salvar:", error);
+            alert("Erro de conexão.");
+        }
     }
 
+    // Marcar/Desmarcar
+    window.toggleStatus = async function(type, id, currentStatus) {
+        const method = currentStatus ? 'DELETE' : 'POST'; 
+        
+        try {
+            const response = await fetch(`${ROUTINE_ENDPOINT}/${type}/${id}/done`, {
+                method: method,
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ completion_date: today })
+            });
 
-    // --- RENDERIZAÇÃO DAS LISTAS (Adaptado para o tema Dark) ---
+            if (response.ok) {
+                // Atualiza localmente (Optimistic UI)
+                if (type === 'meal') {
+                    const item = mealList.find(m => m.id === id);
+                    if(item) item.is_done = !currentStatus;
+                } else {
+                    const item = exerciseList.find(e => e.id === id);
+                    if(item) item.is_done = !currentStatus;
+                }
+                renderAll();
+            }
+        } catch (error) {
+            console.error("Erro ao atualizar status:", error);
+        }
+    };
+
+
+    // --- 2. RENDERIZAÇÃO ---
+
+    function renderAll() {
+        renderMeals();
+        renderExercises();
+        updateDashboardOverview();
+    }
 
     function renderMeals() {
         const container = document.getElementById('mealList');
         container.innerHTML = ''; 
 
-        fakeMeals.forEach(meal => {
+        mealList.forEach(meal => {
+            const isDone = !!meal.is_done; 
+            
             const div = document.createElement('div');
-            // Estilo condicional Dark Mode
             const baseStyle = "flex items-center justify-between p-4 rounded-2xl border transition-all duration-300";
             const activeStyle = "bg-[#161330]/50 border-white/10 hover:border-accentPink/50 hover:bg-[#161330]/80 hover:shadow-lg hover:shadow-accentPink/10 hover:-translate-y-1";
-            const doneStyle = "bg-[#120E29]/30 border-transparent opacity-50 cursor-not-allowed";
+            const doneStyle = "bg-[#120E29]/30 border-transparent opacity-50";
 
-            div.className = `${baseStyle} ${meal.done ? doneStyle : activeStyle}`;
+            div.className = `${baseStyle} ${isDone ? doneStyle : activeStyle}`;
             
             div.innerHTML = `
-                <div class="flex items-center gap-4">
-                    <div onclick="toggleMeal(${meal.id})" class="w-6 h-6 rounded-lg border-2 flex items-center justify-center cursor-pointer transition ${meal.done ? 'border-accentPink bg-accentPink text-white' : 'border-gray-500 hover:border-accentPink'}">
-                        ${meal.done ? '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>' : ''}
+                <div class="flex items-center gap-4 w-full">
+                    <div onclick="toggleStatus('meal', ${meal.id}, ${isDone})" class="w-6 h-6 rounded-lg border-2 flex-shrink-0 flex items-center justify-center cursor-pointer transition ${isDone ? 'border-accentPink bg-accentPink text-white' : 'border-gray-500 hover:border-accentPink'}">
+                        ${isDone ? '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>' : ''}
                     </div>
-                    <div>
-                        <p class="text-sm font-semibold ${meal.done ? 'line-through text-gray-500' : 'text-gray-200'}">${meal.desc}</p>
-                        <p class="text-xs text-accentPink/80 font-medium">${meal.carbs}g Carboidratos</p>
+                    <div class="flex-1">
+                        <p class="text-sm font-semibold ${isDone ? 'line-through text-gray-500' : 'text-gray-200'}">${meal.description}</p>
+                        <p class="text-xs text-accentPink/80 font-medium">${meal.carbs}g Carbos</p>
                     </div>
                 </div>
             `;
             container.appendChild(div);
         });
-        updateDashboardOverview(); // Recalcula ao renderizar
     }
 
     function renderExercises() {
         const container = document.getElementById('exerciseList');
         container.innerHTML = '';
 
-        fakeExercises.forEach(ex => {
+        exerciseList.forEach(ex => {
+            const isDone = !!ex.is_done;
             const div = document.createElement('div');
             const baseStyle = "flex items-center justify-between p-4 rounded-2xl border transition-all duration-300";
             const activeStyle = "bg-[#161330]/50 border-white/10 hover:border-accentCyan/50 hover:bg-[#161330]/80 hover:shadow-lg hover:shadow-accentCyan/10 hover:-translate-y-1";
-            const doneStyle = "bg-[#120E29]/30 border-transparent opacity-50 cursor-not-allowed";
+            const doneStyle = "bg-[#120E29]/30 border-transparent opacity-50";
 
-            div.className = `${baseStyle} ${ex.done ? doneStyle : activeStyle}`;
+            div.className = `${baseStyle} ${isDone ? doneStyle : activeStyle}`;
             
             div.innerHTML = `
-                <div class="flex items-center gap-4">
-                     <div onclick="toggleExercise(${ex.id})" class="w-6 h-6 rounded-lg border-2 flex items-center justify-center cursor-pointer transition ${ex.done ? 'border-accentCyan bg-accentCyan text-white' : 'border-gray-500 hover:border-accentCyan'}">
-                         ${ex.done ? '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>' : ''}
+                <div class="flex items-center gap-4 w-full">
+                    <div onclick="toggleStatus('exercise', ${ex.id}, ${isDone})" class="w-6 h-6 rounded-lg border-2 flex-shrink-0 flex items-center justify-center cursor-pointer transition ${isDone ? 'border-accentCyan bg-accentCyan text-white' : 'border-gray-500 hover:border-accentCyan'}">
+                         ${isDone ? '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>' : ''}
                     </div>
-                    <div>
-                        <p class="text-sm font-semibold ${ex.done ? 'line-through text-gray-500' : 'text-gray-200'}">${ex.type}</p>
-                        <p class="text-xs text-accentCyan/80 font-medium">Duração: ${ex.duration}</p>
+                    <div class="flex-1">
+                        <p class="text-sm font-semibold ${isDone ? 'line-through text-gray-500' : 'text-gray-200'}">${ex.type}</p>
+                        <p class="text-xs text-accentCyan/80 font-medium">${ex.duration} min</p>
                     </div>
                 </div>
             `;
             container.appendChild(div);
         });
-        updateDashboardOverview();
     }
 
-    // --- AÇÕES ---
-    
-    window.toggleMeal = function(id) {
-        const item = fakeMeals.find(m => m.id === id);
-        item.done = !item.done;
-        renderMeals();
-    };
+    function updateDashboardOverview() {
+        const totalTasks = mealList.length + exerciseList.length;
+        const totalDone = mealList.filter(m => m.is_done).length + exerciseList.filter(e => e.is_done).length;
 
-    window.toggleExercise = function(id) {
-        const item = fakeExercises.find(e => e.id === id);
-        item.done = !item.done;
-        renderExercises();
-    };
+        // Gamificação
+        const currentPoints = 150 + (totalDone * 50);
+        const ptsElement = document.getElementById('userPoints');
+        if(ptsElement) ptsElement.innerText = currentPoints;
 
-    // --- LÓGICA DO MODAL ---
+        // Barra de Progresso
+        let percentage = 0;
+        if (totalTasks > 0) percentage = Math.round((totalDone / totalTasks) * 100);
+
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+
+        if(progressBar) progressBar.style.width = `${percentage}%`;
+        if(progressText) progressText.innerText = `${percentage}%`;
+
+        if (percentage === 100 && progressBar) {
+            progressBar.classList.remove('bg-accentPurple');
+            progressBar.classList.add('bg-green-500');
+            progressText.classList.add('text-green-400');
+        } else if (progressBar) {
+            progressBar.classList.add('bg-accentPurple');
+            progressBar.classList.remove('bg-green-500');
+            progressText.classList.remove('text-green-400');
+        }
+    }
+
+    // --- 3. MODAIS ---
+
     const modal = document.getElementById('activityModal');
     const modalTitle = document.getElementById('modalTitle');
+    let currentModalType = ''; 
 
-    // Função global para abrir o modal
     window.openModal = function(type) {
-        // Muda o título dependendo do botão clicado
-        if (type === 'refeicao') {
-            modalTitle.innerText = "Adicionar Nova Refeição 🍎";
+        currentModalType = type;
+        const inputDesc = document.getElementById('inputDesc');
+        const inputVal = document.getElementById('inputValue');
+        const labelVal = document.getElementById('labelValue');
+
+        // Limpa inputs
+        inputDesc.value = '';
+        inputVal.value = '';
+
+        if (type === 'meal') {
+            modalTitle.innerText = "Nova Refeição 🍎";
             modalTitle.className = "text-2xl font-bold text-accentPink";
+            labelVal.innerText = "Carboidratos (g)";
+            inputVal.placeholder = "Ex: 45";
         } else {
-            modalTitle.innerText = "Registrar Exercício 🏃";
+            modalTitle.innerText = "Novo Exercício 🏃";
             modalTitle.className = "text-2xl font-bold text-accentCyan";
+            labelVal.innerText = "Duração (minutos)";
+            inputVal.placeholder = "Ex: 30";
         }
-        // Mostra o modal (remove a classe hidden)
+
         modal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden'; // Impede rolar a página de trás
+        document.body.style.overflow = 'hidden';
     }
 
-    // Função global para fechar o modal
     window.closeModal = function() {
         modal.classList.add('hidden');
-        document.body.style.overflow = 'auto'; // Libera a rolagem
+        document.body.style.overflow = 'auto';
     }
 
-    // Fechar modal se clicar fora da caixa (no backdrop)
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal || e.target.classList.contains('backdrop-blur-sm')) {
-            closeModal();
-        }
-    });
+    // Botão SALVAR do Modal
+    window.confirmAddRoutine = function() {
+        const desc = document.getElementById('inputDesc').value;
+        const val = document.getElementById('inputValue').value;
 
+        if(!desc || !val) {
+            alert("Preencha todos os campos!");
+            return;
+        }
+
+        if (currentModalType === 'meal') {
+            saveRoutine('meal', { description: desc, carbs: val });
+        } else {
+            // O Backend espera { type, duration }
+            saveRoutine('exercise', { type: desc, duration: val });
+        }
+    }
 
     // Logout
     document.getElementById('btnLogout').addEventListener('click', () => {
-        if(confirm('Tem certeza que deseja sair?')) {
+        if(confirm('Sair da plataforma?')) {
             localStorage.removeItem('token');
             localStorage.removeItem('userName');
             window.location.href = 'login.html';
         }
     });
 
-    // Inicializa
-    renderMeals();
-    renderExercises();
+    // Iniciar
+    fetchRoutines();
 });
