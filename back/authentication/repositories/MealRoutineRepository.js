@@ -19,7 +19,7 @@ class MealRoutineRepository {
                 pmr.id, pmr.description, pmr.carbs,
                 CASE WHEN mrc.completion_date IS NOT NULL THEN 1 ELSE 0 END AS is_done
             FROM patient_meal_routine pmr
-            LEFT JOIN meal_routine_completion mrc ON pmr.id = mrc.routine_id AND mrc.completion_date = ?
+            LEFT JOIN meal_routine_completion mrc ON pmr.id = mrc.routine_id AND DATE(mrc.completion_date) = ?
             WHERE pmr.patient_id = ?
             ORDER BY pmr.id ASC;
         `;
