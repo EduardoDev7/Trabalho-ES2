@@ -2,17 +2,38 @@
 
 Eduardo Henrique, Maria Clara e Beatriz Aparecida
 
-Sistema Web Gamificado para pessoas com diabetes.
+**Descrição Geral**
 
+O Sistema Web Gamificado para Controle do Diabetes é uma plataforma integrada desenvolvida para auxiliar pacientes diabéticos no acompanhamento diário da sua saúde. O sistema combina monitoramento clínico com elementos de gamificação para tornar o processo de autocuidado mais motivador, intuitivo e engajador.
 
-Este projeto consiste no desenvolvimento de uma plataforma web integrada voltada para o auxílio no controle do diabetes. O sistema utiliza estratégias de gamificação para motivar pacientes a manterem hábitos saudáveis e realizarem o monitoramento glicêmico regular. Além do componente lúdico, a plataforma serve como um hub de saúde, conectando pacientes a médicos especialistas através de um módulo de agendamento de consultas.
+Além de estimular hábitos saudáveis de forma lúdica, a plataforma funciona como um hub de saúde, oferecendo ferramentas para registro de rotina, acompanhamento visual da evolução, comunicação com profissionais e agendamento de consultas médicas.
 
-Principais Funcionalidades:
+**Problema e Conexão com os ODS**
 
-Rotina Gamificada: O usuário registra atividades diárias (medição de glicemia, exercícios, alimentação) e é recompensado com pontuação baseada na constância.
+O diabetes é uma condição crônica que exige disciplina contínua — incluindo medição regular da glicemia, alimentação equilibrada e prática de atividades físicas. Muitos pacientes enfrentam dificuldades em manter essa rotina, especialmente devido à falta de motivação, falta de acompanhamento adequado ou sensação de sobrecarga.
 
-Sistema de Recompensas: Loja virtual integrada onde os pontos acumulados podem ser trocados por brindes, descontos em farmácias ou insumos médicos.
+O sistema busca solucionar o problema da baixa adesão ao autocuidado por meio de:
 
-Módulo de Agendamento: Interface para busca de médicos cadastrados, visualização de horários disponíveis e marcação de consultas.
+Gamificação, que aumenta o engajamento e a constância;
 
-Dashboard de Saúde: Visualização gráfica da evolução do paciente, que pode ser compartilhada com o médico durante a consulta.
+Monitoramento centralizado, facilitando o acompanhamento do progresso;
+
+Acesso simplificado a médicos, reduzindo barreiras no tratamento contínuo.
+
+A solução se relaciona especialmente com dois Objetivos de Desenvolvimento Sustentável:
+
+ODS 3 – Saúde e Bem-Estar: promove o monitoramento contínuo, incentiva hábitos saudáveis e fortalece o acompanhamento clínico.
+
+ODS 9 – Indústria, Inovação e Infraestrutura: utiliza tecnologia digital para melhorar o acesso a sistemas de saúde e inovar no cuidado de doenças crônicas.
+
+**Público-Alvo** 
+
+O sistema é voltado principalmente para:
+
+Pessoas com diabetes (tipo 1, tipo 2 ou pré-diabetes) que precisam de apoio para manter uma rotina de cuidado contínuo.
+
+Pacientes recém-diagnosticados, que buscam orientação estruturada e motivacional.
+
+Profissionais de saúde, como endocrinologistas e nutricionistas, que desejam acompanhar a evolução de seus pacientes por meio de gráficos e registros atualizados.
+
+Clínicas e centros de saúde, que podem integrar o sistema ao processo de marcação de consultas e acompanhamento de pacientes crônicos.
