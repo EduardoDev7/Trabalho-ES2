@@ -156,3 +156,8 @@ Gráficos devem ser fáceis de interpretar.
 
 Deve haver opção de filtrar por semana e mês.
 
+**Diagrama de Caso de Uso**
+<img width="626" height="572" alt="Captura de Tela 2025-12-10 às 11 25 32" src="https://github.com/user-attachments/assets/327da682-5ea0-4f97-a17a-3a6c5df93b17" />
+
+
+
