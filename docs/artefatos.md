@@ -37,3 +37,22 @@ As rotinas e tarefas concluídas passaram a ser registradas no banco de dados, g
 Beatriz:  7, 8, 3
 Eduardo: 1, 6, 5
 Maria Clara: 2, 3, 4
+
+**Imagens do Sistema**
+
+<img width="1087" height="700" alt="Captura de Tela 2025-12-10 às 11 29 21" src="https://github.com/user-attachments/assets/a74490b1-f80b-4617-8411-df67f2d59eb2" />
+
+<img width="1028" height="718" alt="Captura de Tela 2025-12-10 às 11 29 31" src="https://github.com/user-attachments/assets/be47919b-db54-4829-a5e0-12c82ea561fd" />
+
+<img width="1425" height="743" alt="Captura de Tela 2025-12-10 às 11 29 00" src="https://github.com/user-attachments/assets/7a75c99f-d17e-4990-85b1-22f08058ccd2" />
+
+<img width="942" height="623" alt="Captura de Tela 2025-12-10 às 11 29 08" src="https://github.com/user-attachments/assets/221ff01f-efe2-449f-aea6-6acdbb5a591b" />
+
+
+
+
+
+
+
+
+
