@@ -1,25 +1,36 @@
 **Funcionalidades já entregues**
 
 **SPRINT 1**
+
 1 - Criar interface de login/cadastro 
 
 Foi desenvolvida a primeira tela de interação do usuário com o sistema, contendo os formulários de login e registro. A interface foi estruturada para ser intuitiva, com campos como nome, e-mail e senha. 
+
+<https://github.com/EduardoDev7/Trabalho-ES2/blob/main/front/login.js>
 
 2 - Criar banco de dados para armazenar informações de login
 
 Foi criado o banco de dados inicial contendo as tabelas responsáveis por armazenar credenciais e informações de autenticação dos usuários.
 
+<https://github.com/EduardoDev7/Trabalho-ES2/tree/main/back/authentication/database>
+
 3 - Autenticar informações
 
 Implementou-se a lógica de autenticação, validando credenciais inseridas pelo usuário e comparando-as com os dados armazenados no banco. O sistema bloqueia acessos inválidos e garante que apenas usuários cadastrados possam prosseguir para a área interna da aplicação. A autenticação inclui verificação de senha e e-mail.
+
+<https://github.com/EduardoDev7/Trabalho-ES2/blob/main/back/authentication/src/routes/login.js>
 
 4 - Salvar informações de cadastro no banco de dados
 
 Foi desenvolvida a lógica que permite inserir novos usuários no banco. Durante o cadastro, os dados passam por validação. Após aprovação, as informações são persistidas de forma segura na tabela de usuários, garantindo consistência para os logins futuros.
 
+<https://github.com/EduardoDev7/Trabalho-ES2/blob/main/back/authentication/src/routes/register.js>
+
 5 - Criar interface principal contendo a rotina gamificada
 
 A partir do login, foi desenvolvida a tela principal que exibe a rotina gamificada do usuário. Essa interface apresenta as tarefas diárias que o paciente deve realizar (alimentação e exercícios físicos). A tela já inclui elementos de gamificação, como área de pontuação e progresso diário.
+
+<https://github.com/EduardoDev7/Trabalho-ES2/blob/main/front/dashboard.js>
 
 6 - Criar Menu de paginas
 
@@ -32,6 +43,8 @@ As tarefas gamificadas foram definidas e integradas ao sistema. Cada tarefa poss
 8 - Salvar rotinas no banco de dados
 
 As rotinas e tarefas concluídas passaram a ser registradas no banco de dados, garantindo persistência diária das informações. Cada tarefa concluída é associada ao usuário e data.
+
+<https://github.com/EduardoDev7/Trabalho-ES2/tree/main/back/authentication/repositories>
 
 **Respectivos Responsáveis**
 Beatriz:  7, 8, 3
