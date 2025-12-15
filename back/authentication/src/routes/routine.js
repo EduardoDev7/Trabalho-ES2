@@ -49,7 +49,7 @@ router.get('/:type', async (req, res) => {
     }
 });
 
-// 2. [NOVO] CRIAR Rotina (POST) - Faltava isso!
+// 2. [NOVO] CRIAR Rotina (POST)
 router.post('/:type', (req, res) => {
     const { type } = req.params;
     const patient_id = req.user.id;
