@@ -15,7 +15,6 @@ document.querySelector('form').addEventListener('submit', async function(event) 
     submitButton.disabled = true;
 
     try {
-        // AQUI ESTÁ O SEGREDO: Usar localhost em vez da URL do github
         const response = await fetch('http://localhost:3000/login', {
             method: 'POST',
             headers: {
