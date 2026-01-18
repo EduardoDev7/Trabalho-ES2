@@ -7,7 +7,7 @@ db.pragma("foreign_keys = ON");
 
 class PatientChallengeRepository {
 
-    // CREATE – atribuir desafio ao paciente
+    // CREATE 
     static atribuirDesafio(paciente_id, desafio_id) {
         const stmt = db.prepare(`
             INSERT INTO patient_challenge (patient_id, challenge_id)
@@ -16,7 +16,7 @@ class PatientChallengeRepository {
         return stmt.run(paciente_id, desafio_id).lastInsertRowid;
     }
 
-    // READ – listar desafios do paciente
+    // READ 
     static listarDesafiosDoPaciente(paciente_id) {
         return db.prepare(`
             SELECT 
@@ -31,7 +31,7 @@ class PatientChallengeRepository {
         `).all(paciente_id);
     }
 
-    // UPDATE – marcar desafio como concluído
+    // UPDATE 
     static marcarComoConcluido(id) {
         return db.prepare(`
             UPDATE patient_challenge 
@@ -40,7 +40,7 @@ class PatientChallengeRepository {
         `).run(id).changes;
     }
 
-    // DELETE – remover desafio do paciente
+    // DELETE 
     static remover(id) {
         return db.prepare(`
             DELETE FROM patient_challenge 
