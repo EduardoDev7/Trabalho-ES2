@@ -7,45 +7,46 @@ db.pragma("foreign_keys = ON");
 
 class ChallengeRepository {
 
-    // CREATE
-    static create(title, description, points_reward) {
+    // CREATE 
+    static criar(titulo, descricao, pontos_recompensa) {
         const stmt = db.prepare(`
             INSERT INTO challenge (title, description, points_reward)
             VALUES (?, ?, ?)
         `);
-        return stmt.run(title, description, points_reward).lastInsertRowid;
+        return stmt.run(titulo, descricao, pontos_recompensa).lastInsertRowid;
     }
 
-    // READ
-    static findAll() {
+    // READ 
+    static listarTodos() {
         return db.prepare(`SELECT * FROM challenge`).all();
     }
 
-    static findById(id) {
+    // READ 
+    static buscarPorId(id) {
         return db.prepare(`
             SELECT * FROM challenge WHERE id = ?
         `).get(id);
     }
 
     // UPDATE
-    static update(id, title, description, points_reward) {
-        let fields = [];
-        let params = [];
+    static atualizar(id, titulo, descricao, pontos_recompensa) {
+        let campos = [];
+        let parametros = [];
 
-        if (title !== undefined) { fields.push("title = ?"); params.push(title); }
-        if (description !== undefined) { fields.push("description = ?"); params.push(description); }
-        if (points_reward !== undefined) { fields.push("points_reward = ?"); params.push(points_reward); }
+        if (titulo !== undefined) { campos.push("title = ?"); parametros.push(titulo); }
+        if (descricao !== undefined) { campos.push("description = ?"); parametros.push(descricao); }
+        if (pontos_recompensa !== undefined) { campos.push("points_reward = ?"); parametros.push(pontos_recompensa); }
 
-        if (fields.length === 0) return 0;
+        if (campos.length === 0) return 0;
 
-        const query = `UPDATE challenge SET ${fields.join(", ")} WHERE id = ?`;
-        params.push(id);
+        const query = `UPDATE challenge SET ${campos.join(", ")} WHERE id = ?`;
+        parametros.push(id);
 
-        return db.prepare(query).run(...params).changes;
+        return db.prepare(query).run(...parametros).changes;
     }
 
-    // DELETE
-    static delete(id) {
+    // DELETE 
+    static remover(id) {
         return db.prepare(`
             DELETE FROM challenge WHERE id = ?
         `).run(id).changes;
