@@ -5,7 +5,7 @@ const dbPath = path.join(__dirname, '..', 'authentication', 'database', 'diabete
 const db = new Database(dbPath);
 db.pragma("foreign_keys = ON");
 
-class ConsultationRepository {
+class ConsultationRepository { 
 
     // CREATE
     static create(patient_id, doctor_id, date, notes) {
