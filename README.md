@@ -41,7 +41,7 @@ O sistema é voltado principalmente para:
 **Tecnologias**
 
 Front-End : Tailwind, HTML, CSS, JavaScript.
-Back-End: SQLite, Node.js.
+Back-End: SQLite(3.37.2 2022-01-06), Node.js (v20.19.5).
 
 **Comandos de Execução**
 
