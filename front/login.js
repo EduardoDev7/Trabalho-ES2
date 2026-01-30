@@ -6,47 +6,49 @@ document.querySelector('form').addEventListener('submit', async function(event) 
     const submitButton = this.querySelector('button[type="submit"]');
 
     if (!email || !password) {
-        alert('Por favor, preencha todos os campos!');
+        alert('Preenche tudo aí!');
         return;
     }
 
-    const textoOriginal = submitButton.innerText;
-    submitButton.innerText = 'Conectando...';
+    submitButton.innerText = 'Autenticando...';
     submitButton.disabled = true;
 
     try {
         const response = await fetch('http://localhost:3000/login', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                email: email,
-                password: password
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
         });
 
         if (response.ok) {
             const data = await response.json();
             
-            // Salva o token real vindo do banco de dados
+            // Salva token e dados básicos
             localStorage.setItem('token', data.token);
             localStorage.setItem('userName', data.name);
+            localStorage.setItem('userRole', data.role); // Importante: Salva se é doctor ou patient
+
+            console.log('Login Sucesso. Role:', data.role);
             
-            console.log('Login Realizado:', data);
-            
-            // Redireciona para a dashboard
-            window.location.href = 'dashboard.html';
+            // Redirecionamento inteligente
+            if (data.role === 'doctor') {
+                // Se for médico, vai pro painel dele
+                window.location.href = 'doctor-panel.html';
+            } else {
+                // Se for paciente (ou qualquer outro), vai pro dashboard padrão
+                window.location.href = 'dashboard.html';
+            }
+
         } else {
             const errorData = await response.json();
-            alert('Erro: ' + (errorData.error || 'Email ou senha incorretos'));
+            alert('Ops: ' + (errorData.error || 'Login inválido'));
         }
 
     } catch (error) {
         console.error('Erro:', error);
-        alert('Erro de conexão! Verifique se o servidor (backend) está rodando no terminal.');
+        alert('Sem conexão com o servidor.');
     } finally {
-        submitButton.innerText = textoOriginal;
+        submitButton.innerText = 'Entrar na Plataforma';
         submitButton.disabled = false;
     }
 });

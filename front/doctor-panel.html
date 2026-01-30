@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel Médico - GlicoGame</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: { colors: { darkBg: '#120E29', cardBg: '#1E1B3A', accentBlue: '#3B82F6', accentGreen: '#10B981', accentRed: '#EF4444' } }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .bg-main-gradient { background: linear-gradient(135deg, #120E29 0%, #2E1065 100%); }
+        .glass-card { background: rgba(30, 27, 58, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body class="bg-main-gradient h-screen flex text-gray-100 overflow-hidden">
+
+    <aside class="w-64 bg-[#161330]/80 backdrop-blur-md flex flex-col shadow-2xl z-20 border-r border-white/10">
+        <div class="p-6 text-center font-bold text-2xl tracking-wider border-b border-white/10">
+            MED<span class="text-accentBlue">PANEL</span>
+        </div>
+        <nav class="flex-1 py-6 space-y-3 px-4">
+            <a href="#" class="flex items-center gap-3 px-4 py-3 bg-accentBlue/20 text-accentBlue border border-accentBlue/50 rounded-xl transition font-semibold">
+                <span>📅 Agenda</span>
+            </a>
+        </nav>
+        <div class="p-4 border-t border-white/10">
+            <button onclick="logout()" class="flex items-center gap-3 w-full px-4 py-2 text-gray-400 hover:text-red-400 transition font-medium">Sair</button>
+        </div>
+    </aside>
+
+    <main class="flex-1 p-8 overflow-y-auto">
+        <h1 class="text-3xl font-bold mb-8 text-white">Gerenciamento de Consultas</h1>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <div class="glass-card p-6 rounded-3xl">
+                <h3 class="text-xl font-bold mb-6 flex items-center gap-3 text-white">
+                    <span class="w-3 h-3 rounded-full bg-yellow-500 animate-pulse"></span> Solicitações Pendentes
+                </h3>
+                <div id="pendingContainer" class="space-y-4">
+                    <p class="text-gray-500 text-center">Carregando...</p>
+                </div>
+            </div>
+
+            <div class="glass-card p-6 rounded-3xl">
+                 <h3 class="text-xl font-bold mb-6 flex items-center gap-3 text-white">
+                    <span class="w-3 h-3 rounded-full bg-accentBlue"></span> Agenda Confirmada
+                </h3>
+                <div id="confirmedContainer" class="space-y-4">
+                    <p class="text-gray-500 text-center">Carregando...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="historyModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeHistory()"></div>
+        
+        <div class="glass-card w-full max-w-2xl p-8 rounded-3xl relative z-10 border border-white/20 shadow-2xl fade-in overflow-y-auto max-h-[90vh]">
+            <button onclick="closeHistory()" class="absolute top-4 right-4 text-gray-400 hover:text-white">✕</button>
+            
+            <div class="border-b border-white/10 pb-4 mb-6 flex justify-between items-center">
+                <div>
+                    <h3 class="text-2xl font-bold text-white">Prontuário do Paciente</h3>
+                    <p class="text-accentBlue text-sm font-bold mt-1" id="modalPatientName">Carregando...</p>
+                </div>
+                <div class="bg-accentBlue/20 p-2 rounded-lg text-accentBlue">
+                    📋 Ficha Clínica
+                </div>
+            </div>
+
+            <div class="space-y-6" id="historyContent">
+                <p class="text-center text-gray-500">Buscando dados...</p>
+            </div>
+
+            <div class="mt-8 pt-4 border-t border-white/10 text-right">
+                <button onclick="closeHistory()" class="bg-gray-700 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000';
+        const token = localStorage.getItem('token');
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+
+        async function loadData() {
+            try {
+                const res = await fetch(`${API_URL}/appointments/doctor`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if(res.ok) {
+                    const data = await res.json();
+                    renderPending(data.pending);
+                    renderConfirmed(data.confirmed);
+                }
+            } catch(err) { console.error(err); }
+        }
+
+        function renderPending(list) {
+            const container = document.getElementById('pendingContainer');
+            container.innerHTML = '';
+            if(list.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 italic text-center">Tudo limpo por aqui.</p>';
+                return;
+            }
+
+            list.forEach(req => {
+                container.innerHTML += `
+                    <div class="p-4 bg-[#120E29]/60 rounded-xl border border-white/10 hover:border-white/20 transition">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-bold text-white text-lg">${req.patient_name}</p>
+                                <p class="text-xs text-gray-400">${req.date}</p>
+                            </div>
+                            <button onclick="viewHistory(${req.patient_id}, '${req.patient_name}')" class="text-xs bg-white/5 hover:bg-white/10 text-accentBlue border border-accentBlue/30 px-3 py-1 rounded-full transition flex items-center gap-1">
+                                📄 Ver Prontuário
+                            </button>
+                        </div>
+                        
+                        <p class="text-sm text-gray-300 italic my-4 bg-black/20 p-2 rounded">"${req.notes || 'Sem observações'}"</p>
+                        
+                        <div class="flex gap-3">
+                            <button onclick="updateStatus(${req.id}, 'confirmed')" class="flex-1 bg-green-500/20 text-green-400 hover:bg-green-500 hover:text-white py-2 rounded-lg font-bold text-sm transition border border-green-500/30">Aceitar</button>
+                            <button onclick="updateStatus(${req.id}, 'rejected')" class="flex-1 bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white py-2 rounded-lg font-bold text-sm transition border border-red-500/30">Recusar</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderConfirmed(list) {
+            const container = document.getElementById('confirmedContainer');
+            container.innerHTML = '';
+            if(list.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 italic text-center">Nenhuma consulta na agenda.</p>';
+                return;
+            }
+
+            list.forEach(app => {
+                const linkAction = app.meet_link 
+                    ? `<a href="${app.meet_link}" target="_blank" class="text-accentBlue text-sm underline hover:text-white truncate block mt-1">Link: ${app.meet_link}</a>`
+                    : `<button onclick="addLink(${app.id})" class="text-xs mt-2 bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-white border border-gray-600">+ Add Link Meet</button>`;
+
+                container.innerHTML += `
+                    <div class="flex flex-col p-4 bg-[#120E29]/60 rounded-xl border-l-4 border-accentBlue hover:bg-[#120E29] transition">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-bold text-white">${app.patient_name}</p>
+                                <p class="text-sm text-accentBlue">${app.date}</p>
+                            </div>
+                            <button onclick="viewHistory(${app.patient_id}, '${app.patient_name}')" class="text-gray-400 hover:text-white" title="Ver Prontuário">📋</button>
+                        </div>
+                        <div class="mt-2 border-t border-white/5 pt-2">
+                             ${linkAction}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // --- LÓGICA DO PRONTUÁRIO ---
+        const modal = document.getElementById('historyModal');
+        const modalTitle = document.getElementById('modalPatientName');
+        const modalContent = document.getElementById('historyContent');
+
+        async function viewHistory(patientId, patientName) {
+            modal.classList.remove('hidden');
+            modalTitle.innerText = patientName;
+            modalContent.innerHTML = '<p class="text-center text-gray-400 animate-pulse">Carregando dados do servidor...</p>';
+
+            try {
+                // Rota que vc vai criar no backend: GET /patient/:id/history
+                const res = await fetch(`${API_URL}/patient/${patientId}/history`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if(res.ok) {
+                    const data = await res.json();
+                    
+                    if(!data || Object.keys(data).length === 0) {
+                        modalContent.innerHTML = `
+                            <div class="text-center py-8">
+                                <p class="text-gray-500 text-lg">Este paciente ainda não preencheu o prontuário.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    // Preenche o modal bonito
+                    modalContent.innerHTML = `
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-white/5 p-4 rounded-xl">
+                                <p class="text-xs text-gray-400 uppercase font-bold">Tipo Diabetes</p>
+                                <p class="text-lg text-white font-semibold">${data.diabetes_type || '-'}</p>
+                            </div>
+                            <div class="bg-white/5 p-4 rounded-xl">
+                                <p class="text-xs text-gray-400 uppercase font-bold">Diagnóstico</p>
+                                <p class="text-lg text-white font-semibold">${data.diagnosis_date || '-'}</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-white/5 p-4 rounded-xl border-l-4 border-red-500">
+                            <p class="text-xs text-gray-400 uppercase font-bold mb-1">Alergias</p>
+                            <p class="text-white">${data.allergies || 'Nenhuma relatada'}</p>
+                        </div>
+
+                        <div class="bg-white/5 p-4 rounded-xl border-l-4 border-green-500">
+                            <p class="text-xs text-gray-400 uppercase font-bold mb-1">Medicamentos</p>
+                            <p class="text-white whitespace-pre-line">${data.medications || 'Nenhum'}</p>
+                        </div>
+
+                        <div class="bg-white/5 p-4 rounded-xl">
+                            <p class="text-xs text-gray-400 uppercase font-bold mb-1">Observações Gerais</p>
+                            <p class="text-gray-300 italic">"${data.notes || '...'}"</p>
+                        </div>
+                    `;
+                } else {
+                    modalContent.innerHTML = '<p class="text-red-400 text-center">Erro ao buscar dados.</p>';
+                }
+            } catch(err) {
+                console.error(err);
+                modalContent.innerHTML = '<p class="text-red-400 text-center">Erro de conexão.</p>';
+            }
+        }
+
+        function closeHistory() {
+            modal.classList.add('hidden');
+        }
+
+        // Funções de ação (igual antes)
+        async function updateStatus(id, status) {
+            try {
+                await fetch(`${API_URL}/appointments/${id}/status`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ status })
+                });
+                loadData();
+            } catch(err) { alert('Erro ao atualizar'); }
+        }
+
+        async function addLink(id) {
+            const url = prompt("Link do Meet:");
+            if(!url) return;
+            try {
+                await fetch(`${API_URL}/appointments/${id}/link`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ meet_link: url })
+                });
+                loadData();
+            } catch(err) { alert('Erro'); }
+        }
+
+        loadData();
+    </script>
+</body>
+</html>

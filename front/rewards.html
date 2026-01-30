@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loja de Pontos - GlicoGame</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#120E29', 
+                        cardBg: '#1E1B3A', 
+                        accentPurple: '#7C3AED',
+                        accentPink: '#EC4899',
+                        accentCyan: '#06B6D4'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .bg-main-gradient { background: linear-gradient(135deg, #120E29 0%, #2E1065 100%); }
+        .glass-card {
+            background: rgba(30, 27, 58, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-main-gradient h-screen flex flex-col text-gray-100 overflow-hidden fade-in">
+
+    <header class="p-6 flex justify-between items-center bg-[#161330]/80 border-b border-white/10 backdrop-blur-md">
+        <h1 class="text-2xl font-bold text-white">Loja de <span class="text-accentPink">Recompensas</span> 🎁</h1>
+        
+        <div class="flex items-center gap-4">
+            <div class="glass-card px-4 py-2 rounded-full border border-accentPink/30 flex items-center gap-2">
+                <span class="text-yellow-400 text-lg">★</span>
+                <span class="font-bold text-white" id="pointsDisplay">0</span>
+                <span class="text-xs text-gray-400 uppercase">Pts</span>
+            </div>
+            
+            <a href="dashboard.html" class="text-sm text-gray-300 hover:text-white hover:underline">← Voltar</a>
+        </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-8">
+        <div class="max-w-6xl mx-auto">
+            
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-white mb-2">Troque suor por prêmios</h2>
+                <p class="text-gray-400">Mantenha a constância e desbloqueie benefícios reais.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                
+                <div class="glass-card rounded-2xl overflow-hidden group hover:-translate-y-2 transition duration-300">
+                    <div class="h-48 bg-gray-800 relative">
+                        <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition">
+                        <div class="absolute top-3 right-3 bg-black/60 backdrop-blur px-3 py-1 rounded-lg border border-yellow-500/50">
+                            <span class="text-yellow-400 font-bold">500 pts</span>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-bold text-xl mb-1 text-white">Desconto na Farmácia</h3>
+                        <p class="text-sm text-gray-400 mb-4">10% OFF em medidores e tiras.</p>
+                        <button onclick="redeem(500)" class="w-full bg-accentPink hover:bg-pink-600 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-pink-500/20">
+                            Resgatar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-2xl overflow-hidden group hover:-translate-y-2 transition duration-300">
+                    <div class="h-48 bg-gray-800 relative">
+                        <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition">
+                        <div class="absolute top-3 right-3 bg-black/60 backdrop-blur px-3 py-1 rounded-lg border border-yellow-500/50">
+                            <span class="text-yellow-400 font-bold">1200 pts</span>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-bold text-xl mb-1 text-white">1 Mês de Academia</h3>
+                        <p class="text-sm text-gray-400 mb-4">Válido na rede parceira SmartFit.</p>
+                        <button onclick="redeem(1200)" class="w-full bg-accentPink hover:bg-pink-600 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-pink-500/20">
+                            Resgatar
+                        </button>
+                    </div>
+                </div>
+
+                 <div class="glass-card rounded-2xl overflow-hidden opacity-60">
+                    <div class="h-48 bg-gray-800 relative flex items-center justify-center">
+                         <span class="text-2xl font-bold text-white border-2 border-white px-4 py-2 -rotate-12">ESGOTADO</span>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-bold text-xl mb-1 text-white">Consulta Nutri Extra</h3>
+                        <p class="text-sm text-gray-400 mb-4">Sessão bônus online.</p>
+                        <button disabled class="w-full bg-gray-700 text-gray-400 font-bold py-3 rounded-xl cursor-not-allowed">
+                            Indisponível
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Pega do localStorage pra ficar sincronizado com o dashboard
+        let myPoints = parseInt(localStorage.getItem('userPoints') || 0);
+        
+        // Se no dashboard a gente definiu um valor base, aqui mostra ele
+        // Vou forçar um update visual
+        document.getElementById('pointsDisplay').innerText = myPoints;
+
+        function redeem(cost) {
+            if(myPoints >= cost) {
+                if(confirm('Tem certeza que quer gastar seus pontos?')) {
+                    alert('Parabéns! Cupom enviado pro seu email.');
+                    // Desconta só visualmente aqui, num app real chamaria API
+                    myPoints -= cost;
+                    document.getElementById('pointsDisplay').innerText = myPoints;
+                    // Atualiza no storage pro dashboard ver depois
+                    localStorage.setItem('userPoints', myPoints);
+                }
+            } else {
+                alert('Você precisa de mais pontos! Cumpra suas metas diárias.');
+            }
+        }
+    </script>
+</body>
+</html>

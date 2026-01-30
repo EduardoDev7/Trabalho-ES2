@@ -10,34 +10,68 @@
         body { font-family: 'Inter', sans-serif; }
         .fade-in { animation: fadeIn 0.5s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Classe utilitária pra esconder coisas */
+        .hidden-field { display: none; }
     </style>
 </head>
 <body class="bg-gray-50 h-screen w-full flex items-center justify-center">
 
-    <div class="bg-white rounded-2xl shadow-2xl overflow-hidden flex max-w-4xl w-full m-4 fade-in h-[650px]">
-        
-        <div class="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center relative">
+    <div class="bg-white rounded-2xl shadow-2xl overflow-hidden flex max-w-4xl w-full m-4 fade-in h-[700px]"> <div class="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center relative">
             <div class="mb-6">
                 <h1 class="text-3xl font-bold text-gray-800 mb-2">Crie sua conta</h1>
-                <p class="text-gray-500">Comece sua jornada de saúde gamificada hoje.</p>
+                <p class="text-gray-500">Escolha seu perfil abaixo:</p>
             </div>
 
-            <form id="registerForm" class="space-y-4">
+            <div class="flex gap-4 mb-6 bg-gray-100 p-1 rounded-lg">
+                <label class="flex-1 text-center cursor-pointer">
+                    <input type="radio" name="userType" value="patient" checked class="peer hidden" onchange="toggleFields()">
+                    <span class="block py-2 rounded-md text-gray-500 peer-checked:bg-white peer-checked:text-purple-600 peer-checked:shadow font-bold transition">
+                        Sou Paciente
+                    </span>
+                </label>
+                <label class="flex-1 text-center cursor-pointer">
+                    <input type="radio" name="userType" value="doctor" class="peer hidden" onchange="toggleFields()">
+                    <span class="block py-2 rounded-md text-gray-500 peer-checked:bg-white peer-checked:text-purple-600 peer-checked:shadow font-bold transition">
+                        Sou Médico
+                    </span>
+                </label>
+            </div>
+
+            <form id="registerForm" class="space-y-3">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label>
-                    <input type="text" id="reg-name" placeholder="Seu nome" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none transition bg-gray-50">
+                    <input type="text" id="reg-name" placeholder="Seu nome" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-purple-500 outline-none bg-gray-50">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
-                    <input type="email" id="reg-email" placeholder="seu@email.com" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none transition bg-gray-50">
+                    <input type="email" id="reg-email" placeholder="seu@email.com" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-purple-500 outline-none bg-gray-50">
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
-                    <input type="password" id="reg-password" placeholder="••••••••" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none transition bg-gray-50">
+                
+                <div id="doctorFields" class="hidden-field space-y-3">
+                    <div class="flex gap-2">
+                        <div class="w-1/2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">CRM</label>
+                            <input type="text" id="reg-crm" placeholder="12345/UF" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-purple-500 outline-none bg-gray-50">
+                        </div>
+                        <div class="w-1/2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Especialidade</label>
+                            <select id="reg-spec" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-purple-500 outline-none bg-gray-50">
+                                <option value="Endocrinologista">Endocrinologista</option>
+                                <option value="Nutricionista">Nutricionista</option>
+                                <option value="Clínico Geral">Clínico Geral</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
-                <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg shadow-lg hover:shadow-purple-500/30 transition duration-300 transform hover:-translate-y-0.5">
-                    Cadastrar
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+                    <input type="password" id="reg-password" placeholder="••••••••" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-purple-500 outline-none bg-gray-50">
+                </div>
+
+                <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg shadow-lg transition duration-300 mt-2">
+                    Finalizar Cadastro
                 </button>
             </form>
 
@@ -47,12 +81,12 @@
             </div>
         </div>
 
-        <div class="hidden md:flex w-1/2 bg-gradient-to-bl from-purple-700 to-indigo-600 items-center justify-center relative p-10 text-white">
+        <div class="hidden md:flex w-1/2 bg-gradient-to-bl from-purple-700 to-indigo-600 items-center justify-center p-10 text-white relative">
             <div class="relative z-10 text-center">
-                <h2 class="text-3xl font-bold mb-4">Junte-se à comunidade</h2>
-                <p class="text-purple-100">Monitore sua glicemia, cumpra desafios e ganhe recompensas reais pela sua dedicação.</p>
+                <h2 class="text-3xl font-bold mb-4">Saúde Integrada</h2>
+                <p class="text-purple-100">Pacientes controlam sua rotina. Médicos acompanham o progresso. Tudo num só lugar.</p>
             </div>
-            <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1550989460-0adf9ea622e2?q=80&w=1000&auto=format&fit=crop')] opacity-10 bg-cover bg-center mixture-blend-overlay"></div>
+             <div class="absolute inset-0 bg-black opacity-10"></div>
         </div>
     </div>
     
