@@ -32,6 +32,12 @@ app.use('/login', loginRoute);
 const routineRoute = require('./routes/routine');
 app.use('/api/routines', routineRoute);
 
+const reportRoutes = require('./routes/reports');
+app.use('/reports', reportRoutes);
+
+const patientRoutes = require('./routes/patient');
+app.use('/patient', patientRoutes);
+
 // Porta
 const PORT = process.env.PORT || 3000;
 
