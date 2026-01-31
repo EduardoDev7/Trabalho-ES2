@@ -1,3 +1,4 @@
+// MealRoutineRepository.js
 const path = require("path");
 // Importa o banco centralizado
 const db = require(path.resolve(__dirname, '..', 'src', 'db.js'));
@@ -13,18 +14,21 @@ class MealRoutineRepository {
         return info.lastInsertRowid;
     }
 
-    static getRoutinesWithDailyStatus(patient_id, today_date) {
-        const query = `
-            SELECT 
-                pmr.id, pmr.description, pmr.carbs,
-                CASE WHEN mrc.completion_date IS NOT NULL THEN 1 ELSE 0 END AS is_done
-            FROM patient_meal_routine pmr
-            LEFT JOIN meal_routine_completion mrc ON pmr.id = mrc.routine_id AND DATE(mrc.completion_date) = ?
-            WHERE pmr.patient_id = ?
-            ORDER BY pmr.id ASC;
-        `;
-        return db.prepare(query).all(today_date, patient_id);
-    }
+    static getRoutinesWithDailyStatus(patient_id, date_to_filter) {
+    const query = `
+        SELECT 
+            pmr.id, pmr.description, pmr.carbs,
+            CASE WHEN mrc.completion_date IS NOT NULL THEN 1 ELSE 0 END AS is_done
+        FROM patient_meal_routine pmr
+        LEFT JOIN meal_routine_completion mrc 
+            ON pmr.id = mrc.routine_id 
+            AND mrc.completion_date = ?
+        WHERE pmr.patient_id = ? 
+          AND DATE(pmr.created_at) = ?  -- Filtra apenas as criadas no dia específico
+        ORDER BY pmr.id ASC;
+    `;
+    return db.prepare(query).all(date_to_filter, patient_id, date_to_filter);
+}
 
     static markRoutineAsDone(routine_id, patient_id, completion_date) {
         const stmt = db.prepare(`

@@ -13,18 +13,21 @@ class ExerciseRoutineRepository {
         return info.lastInsertRowid;
     }
 
-    static getRoutinesWithDailyStatus(patient_id, today_date) {
-        const query = `
-            SELECT 
-                per.id, per.type, per.duration,
-                CASE WHEN erc.completion_date IS NOT NULL THEN 1 ELSE 0 END AS is_done
-            FROM patient_exercise_routine per
-            LEFT JOIN exercise_routine_completion erc ON per.id = erc.routine_id AND DATE(erc.completion_date) = ?
-            WHERE per.patient_id = ?
-            ORDER BY per.id ASC;
-        `;
-        return db.prepare(query).all(today_date, patient_id);
-    }
+    static getRoutinesWithDailyStatus(patient_id, date_to_filter) {
+    const query = `
+        SELECT 
+            per.id, per.type, per.duration,
+            CASE WHEN erc.completion_date IS NOT NULL THEN 1 ELSE 0 END AS is_done
+        FROM patient_exercise_routine per
+        LEFT JOIN exercise_routine_completion erc 
+            ON per.id = erc.routine_id 
+            AND erc.completion_date = ?
+        WHERE per.patient_id = ? 
+          AND DATE(per.created_at) = ? -- Filtra apenas as criadas no dia específico
+        ORDER BY per.id ASC;
+    `;
+    return db.prepare(query).all(date_to_filter, patient_id, date_to_filter);
+}
     
     static markRoutineAsDone(routine_id, patient_id, completion_date) {
         const stmt = db.prepare(`

@@ -45,23 +45,6 @@ CREATE TABLE IF NOT EXISTS consultation (
   FOREIGN KEY (doctor_id) REFERENCES doctor(id)
 );
 
-CREATE TABLE IF NOT EXISTS meal_log (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  patient_id INTEGER NOT NULL,
-  description TEXT,
-  carbs INTEGER,
-  date TEXT NOT NULL,
-  FOREIGN KEY (patient_id) REFERENCES patient(id)
-);
-
-CREATE TABLE IF NOT EXISTS exercise_log (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  patient_id INTEGER NOT NULL,
-  type TEXT NOT NULL,
-  duration INTEGER NOT NULL,
-  date TEXT NOT NULL,
-  FOREIGN KEY (patient_id) REFERENCES patient(id)
-);
 
 CREATE TABLE IF NOT EXISTS gamification_points (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
