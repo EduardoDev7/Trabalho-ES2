@@ -28,7 +28,7 @@ app.use('/register/doctor', registerDoctorRoute);
 const loginRoute = require('./routes/login');
 app.use('/login', loginRoute);
 
-// 4. Rotinas (Dashboard)
+// 4. Rotinas
 const routineRoute = require('./routes/routine');
 app.use('/api/routines', routineRoute);
 
@@ -37,6 +37,10 @@ app.use('/reports', reportRoutes);
 
 const patientRoutes = require('./routes/patient');
 app.use('/patient', patientRoutes);
+
+// 5. Listagem de Médicos
+const doctorsRoute = require('./routes/doctors');
+app.use('/doctors', doctorsRoute);
 
 // Porta
 const PORT = process.env.PORT || 3000;
