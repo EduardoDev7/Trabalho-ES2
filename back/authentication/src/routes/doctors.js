@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db'); 
 
-// Rota GET para listar médicos
+// Rota GET para listar médicos 
 // Aqui usamos '/' porque no server.js já vamos definir que essa rota responde por '/doctors'
 router.get('/', (req, res) => {
     try {
