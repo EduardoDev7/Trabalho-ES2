@@ -1,10 +1,8 @@
-// [CreateAllTables.js]
-
 const Database = require("better-sqlite3");
 const fs = require("fs");
 const path = require("path");
 
-const dbPath = path.join(__dirname, "diabetes.db");
+const dbPath = path.resolve(__dirname, 'diabetes.db');
 
 // cria pasta se não existir
 if (!fs.existsSync(path.dirname(dbPath))) {
@@ -34,6 +32,7 @@ CREATE TABLE IF NOT EXISTS doctor (
   crm TEXT UNIQUE NOT NULL,
   especialidade TEXT NOT NULL
 );
+
 CREATE TABLE IF NOT EXISTS consultation (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   patient_id INTEGER NOT NULL,
