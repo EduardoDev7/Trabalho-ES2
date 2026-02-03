@@ -34,13 +34,17 @@ CREATE TABLE IF NOT EXISTS doctor (
   crm TEXT UNIQUE NOT NULL,
   especialidade TEXT NOT NULL
 );
-
 CREATE TABLE IF NOT EXISTS consultation (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   patient_id INTEGER NOT NULL,
   doctor_id INTEGER NOT NULL,
   date TEXT NOT NULL,
-  notes TEXT,
+  
+  reason TEXT,                    
+  status TEXT DEFAULT 'pending',  
+  
+  notes TEXT,                     
+  
   FOREIGN KEY (patient_id) REFERENCES patient(id),
   FOREIGN KEY (doctor_id) REFERENCES doctor(id)
 );
