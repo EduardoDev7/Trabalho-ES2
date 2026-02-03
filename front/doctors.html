@@ -63,7 +63,7 @@
                             <span class="w-2 h-2 rounded-full bg-yellow-500"></span> Aguardando Confirmação
                         </h3>
                         <div id="pendingList" class="space-y-3">
-                            <p class="text-sm text-gray-500 italic">Nenhuma solicitação pendente.</p>
+                            <p class="text-sm text-gray-500 italic">Carregando...</p>
                         </div>
                     </div>
 
@@ -72,7 +72,7 @@
                             <span class="w-2 h-2 rounded-full bg-accentCyan"></span> Consultas Agendadas
                         </h3>
                         <div id="confirmedList" class="space-y-3">
-                            <p class="text-sm text-gray-500 italic">Nenhuma consulta confirmada.</p>
+                            <p class="text-sm text-gray-500 italic">Carregando...</p>
                         </div>
                     </div>
                 </div>
@@ -96,7 +96,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Motivo</label>
-                    <textarea id="appNotes" rows="3" class="w-full bg-[#120E29] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-accentCyan outline-none"></textarea>
+                    <textarea id="appNotes" rows="3" placeholder="Ex: Dor de cabeça frequente..." class="w-full bg-[#120E29] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-accentCyan outline-none"></textarea>
                 </div>
                 <button type="submit" class="w-full py-3 rounded-xl bg-accentCyan hover:bg-cyan-400 text-white font-bold transition">Confirmar</button>
             </form>
@@ -104,9 +104,14 @@
     </div>
 
     <script>
-        const API_URL = 'http://localhost:3000'; // Ajustar se mudar a porta
+        const API_URL = 'http://localhost:3000'; 
         const token = localStorage.getItem('token');
-        const userId = localStorage.getItem('userId'); // Precisa salvar o ID no login.js tbm
+
+        // Redirecionar se não estiver logado
+        if (!token) {
+            alert("Sessão expirada. Faça login novamente.");
+            window.location.href = "login.html"; 
+        }
 
         // --- LÓGICA DE ABAS ---
         function switchTab(tab) {
@@ -122,7 +127,7 @@
                 tabSearch.classList.remove('tab-inactive', 'text-gray-400');
                 tabMy.classList.remove('tab-active', 'text-accentCyan');
                 tabMy.classList.add('tab-inactive');
-                loadDoctors(); // Recarrega lista
+                loadDoctors(); 
             } else {
                 searchContent.classList.add('hidden');
                 myContent.classList.remove('hidden');
@@ -130,14 +135,13 @@
                 tabSearch.classList.add('tab-inactive');
                 tabMy.classList.add('tab-active', 'text-accentCyan');
                 tabMy.classList.remove('tab-inactive');
-                loadMyAppointments(); // Carrega minhas consultas
+                loadMyAppointments(); 
             }
         }
 
-        // --- FETCH MÉDICOS (DADOS REAIS) ---
+        // --- 1. CARREGAR MÉDICOS (GET /doctors) ---
         async function loadDoctors() {
             try {
-                // TODO: Criar rota GET /doctors no backend
                 const res = await fetch(`${API_URL}/doctors`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
@@ -148,7 +152,7 @@
                 if(res.ok) {
                     const doctors = await res.json();
                     if(doctors.length === 0) {
-                        grid.innerHTML = '<p class="text-gray-500 col-span-3 text-center">Nenhum médico cadastrado ainda.</p>';
+                        grid.innerHTML = '<p class="text-gray-500 col-span-3 text-center">Nenhum médico disponível no momento.</p>';
                         return;
                     }
 
@@ -160,8 +164,8 @@
                                 <img src="https://ui-avatars.com/api/?name=${doc.name}&background=0D8ABC&color=fff" class="w-full h-full object-cover">
                             </div>
                             <h3 class="text-xl font-bold text-white">${doc.name}</h3>
-                            <span class="text-xs bg-accentCyan/10 text-accentCyan px-2 py-1 rounded mt-1">${doc.especialidade}</span>
-                            <p class="text-gray-400 text-xs mt-2">CRM: ${doc.crm}</p>
+                            <span class="text-xs bg-accentCyan/10 text-accentCyan px-2 py-1 rounded mt-1">${doc.especialidade || 'Clínico Geral'}</span>
+                            <p class="text-gray-400 text-xs mt-2">CRM: ${doc.crm || '---'}</p>
                             <button onclick="openModal('${doc.id}', '${doc.name}')" class="mt-4 w-full py-2 bg-accentCyan/20 text-accentCyan border border-accentCyan/50 rounded-lg hover:bg-accentCyan hover:text-white transition font-bold text-sm">
                                 Agendar
                             </button>
@@ -171,19 +175,20 @@
                 }
             } catch (err) {
                 console.error("Erro ao carregar médicos:", err);
+                document.getElementById('doctorsGrid').innerHTML = '<p class="text-red-400 col-span-3 text-center">Erro ao conectar com o servidor.</p>';
             }
         }
 
-        // --- FETCH MINHAS CONSULTAS ---
+        // --- 2. CARREGAR MINHAS CONSULTAS (GET /consultations/my-consultations) ---
         async function loadMyAppointments() {
             try {
-                // TODO: Criar rota GET /appointments/patient no backend
-                const res = await fetch(`${API_URL}/appointments/patient`, {
+                // Rota ajustada para bater com o server.js
+                const res = await fetch(`${API_URL}/consultations/my-consultations`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
                 if(res.ok) {
-                    const data = await res.json(); // Espera { pending: [], confirmed: [] }
+                    const allConsultations = await res.json(); 
                     
                     const pendingDiv = document.getElementById('pendingList');
                     const confirmedDiv = document.getElementById('confirmedList');
@@ -191,42 +196,42 @@
                     pendingDiv.innerHTML = '';
                     confirmedDiv.innerHTML = '';
 
-                    // Lista Pendentes
-                    if(data.pending.length > 0) {
-                        data.pending.forEach(app => {
+                    // Filtra o que é pendente e o que é confirmado
+                    const pending = allConsultations.filter(c => c.status === 'pending');
+                    const confirmed = allConsultations.filter(c => c.status === 'confirmed');
+
+                    // Renderiza Pendentes
+                    if(pending.length > 0) {
+                        pending.forEach(app => {
                             pendingDiv.innerHTML += `
-                                <div class="p-3 bg-[#120E29]/50 rounded-lg border border-white/5">
-                                    <p class="font-bold text-white">${app.doctor_name}</p>
-                                    <p class="text-xs text-gray-400">${app.date} - Aguardando...</p>
-                                </div>
-                            `;
-                        });
-                    } else { pendingDiv.innerHTML = '<p class="text-sm text-gray-500 italic">Nada por aqui.</p>'; }
-
-                    // Lista Confirmados
-                    if(data.confirmed.length > 0) {
-                        data.confirmed.forEach(app => {
-                            // Se tiver link, mostra botão, senão avisa
-                            const linkBtn = app.meet_link 
-                                ? `<a href="${app.meet_link}" target="_blank" class="block text-center mt-2 bg-green-600/20 text-green-400 py-1 rounded border border-green-600/50 hover:bg-green-600 hover:text-white text-xs font-bold transition">Entrar na Sala 🎥</a>`
-                                : `<span class="block text-center mt-2 text-xs text-gray-500 border border-gray-700 rounded py-1">Link ainda não disponível</span>`;
-
-                            confirmedDiv.innerHTML += `
-                                <div class="p-4 bg-[#120E29]/50 rounded-lg border-l-4 border-accentCyan">
+                                <div class="p-3 bg-[#120E29]/50 rounded-lg border border-white/5 mb-2 hover:bg-[#1E1B3A] transition">
                                     <p class="font-bold text-white">${app.doctor_name}</p>
                                     <p class="text-sm text-accentCyan">${app.date}</p>
-                                    ${linkBtn}
+                                    <p class="text-xs text-gray-400 mt-1">"${app.reason || 'Sem motivo'}"</p>
                                 </div>
                             `;
                         });
-                    } else { confirmedDiv.innerHTML = '<p class="text-sm text-gray-500 italic">Nenhuma agendada.</p>'; }
+                    } else { pendingDiv.innerHTML = '<p class="text-sm text-gray-500 italic">Nenhuma solicitação pendente.</p>'; }
+
+                    // Renderiza Confirmados
+                    if(confirmed.length > 0) {
+                        confirmed.forEach(app => {
+                            confirmedDiv.innerHTML += `
+                                <div class="p-4 bg-[#120E29]/50 rounded-lg border-l-4 border-accentCyan mb-2">
+                                    <p class="font-bold text-white">${app.doctor_name}</p>
+                                    <p class="text-sm text-accentCyan font-bold">${app.date}</p>
+                                    <p class="text-xs text-green-400 mt-1">Status: Confirmado</p>
+                                </div>
+                            `;
+                        });
+                    } else { confirmedDiv.innerHTML = '<p class="text-sm text-gray-500 italic">Nenhuma consulta confirmada.</p>'; }
                 }
             } catch (err) {
                 console.error("Erro minhas consultas:", err);
             }
         }
 
-        // --- MODAL E ENVIO ---
+        // --- 3. ENVIAR AGENDAMENTO (POST /consultations/schedule) ---
         const modal = document.getElementById('scheduleModal');
         
         function openModal(id, name) {
@@ -241,33 +246,41 @@
             
             const doctorId = document.getElementById('selectedDoctorId').value;
             const date = document.getElementById('appDate').value;
-            const notes = document.getElementById('appNotes').value;
+            const notes = document.getElementById('appNotes').value; // O usuário digita notas
 
-            // Envia pro backend
             try {
-                const res = await fetch(`${API_URL}/appointments`, {
+                const res = await fetch(`${API_URL}/consultations/schedule`, {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
-                    body: JSON.stringify({ doctor_id: doctorId, date, notes })
+                    // Enviamos como 'reason' porque é assim que o banco espera
+                    body: JSON.stringify({ 
+                        doctor_id: doctorId, 
+                        date: date, 
+                        reason: notes 
+                    })
                 });
 
+                const data = await res.json();
+
                 if(res.ok) {
-                    alert('Solicitação enviada! Acompanhe na aba "Minhas Consultas".');
+                    alert('' + data.message);
                     closeModal();
-                    switchTab('my-appointments'); // Já joga o cara pra aba de status
+                    document.getElementById('appointmentForm').reset();
+                    // Muda aba para ver o resultado
+                    switchTab('my-appointments'); 
                 } else {
-                    alert('Erro ao agendar.');
+                    alert('Erro: ' + (data.error || 'Falha ao agendar'));
                 }
             } catch(err) {
                 console.error(err);
-                alert('Erro de conexão.');
+                alert('Erro de conexão com o servidor.');
             }
         });
 
-        // Inicia na busca
+        // Inicia carregando médicos
         loadDoctors();
     </script>
 </body>
