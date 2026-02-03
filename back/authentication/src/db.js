@@ -2,21 +2,21 @@ const Database = require('better-sqlite3');
 const path = require('path');
 const fs = require('fs');
 
-// CAMINHO ÚNICO: Aponta para a pasta 'database'
+// Caminho do banco
 const dbPath = path.resolve(__dirname, '..', 'database', 'diabetes.db');
 const dbDir = path.dirname(dbPath);
 
-// Garante que a pasta existe
+// Cria a pasta se não existir
 if (!fs.existsSync(dbDir)) {
     fs.mkdirSync(dbDir, { recursive: true });
 }
 
-const db = new Database(dbPath);
+// Abre o banco mostrando logs 
+const db = new Database(dbPath, { verbose: console.log });
 
-// Ativa chaves estrangeiras para garantir integridade
-db.pragma('journal_mode = WAL');
+// Mantém as chaves estrangeiras
 db.pragma('foreign_keys = ON');
 
-console.log(`✅ BANCO ATIVO: ${dbPath}`);
+console.log(`✅ BANCO CONECTADO (Modo Seguro): ${dbPath}`);
 
 module.exports = db;
