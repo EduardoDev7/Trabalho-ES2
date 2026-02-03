@@ -42,6 +42,10 @@ app.use('/patient', patientRoutes);
 const doctorsRoute = require('./routes/doctors');
 app.use('/doctors', doctorsRoute);
 
+// 6. Consultas 
+const consultationRoute = require('./routes/consultation'); 
+app.use('/consultations', consultationRoute);
+
 // Porta
 const PORT = process.env.PORT || 3000;
 
