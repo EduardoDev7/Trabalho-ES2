@@ -254,6 +254,7 @@
                 if(res.ok) {
                     const data = await res.json();
                     if(data) {
+                        
                         document.getElementById('diabetesType').value = data.diabetes_type || 'Tipo 1';
                         document.getElementById('diagnosisDate').value = data.diagnosis_date || '';
                         document.getElementById('allergies').value = data.allergies || '';
