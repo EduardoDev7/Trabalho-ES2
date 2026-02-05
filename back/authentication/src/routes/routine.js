@@ -6,6 +6,7 @@ require('dotenv').config();
 // Repositórios
 const MealRoutineRepository = require('../../repositories/MealRoutineRepository');
 const ExerciseRoutineRepository = require('../../repositories/ExerciseRoutineRepository');
+const GamificationRepository = require('../../repositories/GamificationRepository');
 
 // Middleware de Autenticação
 const authMiddleware = (req, res, next) => {
@@ -93,8 +94,13 @@ router.post('/:type/:routineId/done', (req, res) => {
         if (type === 'meal') changes = MealRoutineRepository.markRoutineAsDone(routineId, patient_id, completion_date);
         else if (type === 'exercise') changes = ExerciseRoutineRepository.markRoutineAsDone(routineId, patient_id, completion_date);
         
-        if (changes > 0) return res.status(201).json({ message: 'Concluído.' });
-        else return res.status(200).json({ message: 'Já estava concluído.' });
+        // NOVO: Se o banco confirmou a alteração, adicionamos os pontos
+        if (changes > 0) {
+            GamificationRepository.updatePoints(patient_id, 50); 
+            return res.status(201).json({ message: 'Concluído e +50 pontos adicionados!' });
+        } else {
+            return res.status(200).json({ message: 'Já estava concluído.' });
+        }
     } catch (error) {
         return res.status(500).json({ error: 'Erro interno.' });
     }
@@ -112,8 +118,14 @@ router.delete('/:type/:routineId/done', (req, res) => {
         if (type === 'meal') changes = MealRoutineRepository.unmarkRoutineAsDone(routineId, completion_date);
         else if (type === 'exercise') changes = ExerciseRoutineRepository.unmarkRoutineAsDone(routineId, completion_date);
 
-        if (changes > 0) return res.status(200).json({ message: 'Desmarcado.' });
-        else return res.status(404).json({ error: 'Não encontrado.' });
+        // NOVO: Se removeu o check, removemos os pontos do banco
+        if (changes > 0) {
+            // Pegamos o ID do paciente através do token (req.user.id)
+            GamificationRepository.updatePoints(req.user.id, -50); 
+            return res.status(200).json({ message: 'Desmarcado e -50 pontos removidos.' });
+        } else {
+            return res.status(404).json({ error: 'Não encontrado.' });
+        }
     } catch (error) {
         return res.status(500).json({ error: 'Erro interno.' });
     }

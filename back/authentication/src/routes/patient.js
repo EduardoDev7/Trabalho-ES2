@@ -1,7 +1,9 @@
+//patient.js
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const path = require('path');
+const GamificationRepository = require('../../repositories/GamificationRepository');
 
 // Importa o banco de dados (ajuste o caminho se necessário)
 const db = require(path.resolve(__dirname, '..', 'db.js'));
@@ -54,6 +56,17 @@ router.post('/history', authMiddleware, (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Erro ao salvar ficha médica.' });
+    }
+});
+
+router.get('/points', authMiddleware, (req, res) => {
+    try {
+        const patient_id = req.user.id;
+        const points = GamificationRepository.getPoints(patient_id);
+        res.json({ points });
+    } catch (error) {
+        console.error("Erro ao buscar pontos:", error);
+        res.status(500).json({ error: "Erro interno ao buscar pontos." });
     }
 });
 
