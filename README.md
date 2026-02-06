@@ -45,5 +45,7 @@ Back-End: SQLite(3.37.2 2022-01-06), Node.js (v20.19.5).
 
 **Comandos de Execução**
 
-cd back/authentication       
+cd back/authentication   
+rm -rf node_modules package-lock.json
+npm install
 node src/server.js 
