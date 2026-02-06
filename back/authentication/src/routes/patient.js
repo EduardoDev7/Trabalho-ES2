@@ -74,5 +74,20 @@ router.get('/points', authMiddleware, (req, res) => {
     }
 });
 
+router.post('/spend-points', authMiddleware, (req, res) => {
+    const { amount } = req.body;
+    try {
+        const patient_id = req.user.id;
+        // Passamos o valor negativo para subtrair
+        GamificationRepository.updatePoints(patient_id, -amount);
+        
+        const newTotal = GamificationRepository.getPoints(patient_id);
+        res.json({ message: 'Pontos resgatados!', points: newTotal });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erro ao processar resgate.' });
+    }
+});
+
 
 module.exports = router;
