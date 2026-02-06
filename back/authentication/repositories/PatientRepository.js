@@ -1,15 +1,13 @@
 const Database = require("better-sqlite3");
 const path = require("path");
 
-const dbPath = path.join(__dirname, '..', 'authentication', 'database', 'diabetes.db');
+const dbPath = path.join(__dirname, '..', 'database', 'diabetes.db');
 const db = new Database(dbPath);
 db.pragma("foreign_keys = ON");
 
 class PatientRepository {
     
     static db = db; 
-
-    //CRUD ESSENCIAL
 
     // CREATE
     static create(name, email, password) {

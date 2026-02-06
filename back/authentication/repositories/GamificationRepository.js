@@ -1,31 +1,51 @@
 const db = require('../src/db');
 
 class GamificationRepository {
-    // Busca os pontos atuais ou cria o registro inicial de 150
+
     static getPoints(patient_id) {
-        let row = db.prepare('SELECT points FROM gamification_points WHERE patient_id = ?').get(patient_id);
+        console.log('🔎 [getPoints] patient_id recebido:', patient_id);
+
+        const row = db.prepare(
+            'SELECT points FROM gamification_points WHERE patient_id = ?'
+        ).get(patient_id);
+
+        console.log('📦 [getPoints] row encontrada:', row);
+
         if (!row) {
-            db.prepare('INSERT INTO gamification_points (patient_id, points) VALUES (?, 150)').run(patient_id);
+            console.warn('⚠️ [getPoints] Nenhum registro encontrado. CRIANDO COM 150!');
+            
+            db.prepare(
+                'INSERT INTO gamification_points (patient_id, points) VALUES (?, 150)'
+            ).run(patient_id);
+
             return 150;
         }
+
+        console.log('✅ [getPoints] Retornando pontos:', row.points);
         return row.points;
     }
 
-    // Soma ou subtrai pontos
     static updatePoints(patient_id, amount) {
-    // 1. Tenta atualizar os pontos
-    const result = db.prepare('UPDATE gamification_points SET points = MAX(0, points + ?) WHERE patient_id = ?')
-                     .run(amount, patient_id);
+        console.log('➕ [updatePoints] patient_id:', patient_id, 'amount:', amount);
 
-    // 2. Se nenhuma linha foi afetada (result.changes === 0), o usuário não existe na tabela
-    if (result.changes === 0) {
-        // Se for uma adição de pontos, criamos o registro inicial (150) + os pontos da tarefa
-        // Se for uma subtração, apenas criamos com o valor inicial
-        const initialValue = 150 + (amount > 0 ? amount : 0);
-        db.prepare('INSERT INTO gamification_points (patient_id, points) VALUES (?, ?)')
-          .run(patient_id, initialValue);
+        const result = db.prepare(
+            'UPDATE gamification_points SET points = MAX(0, points + ?) WHERE patient_id = ?'
+        ).run(amount, patient_id);
+
+        console.log('🧾 [updatePoints] linhas afetadas:', result.changes);
+
+        if (result.changes === 0) {
+            const initialValue = 150 + (amount > 0 ? amount : 0);
+            console.warn(
+                '⚠️ [updatePoints] Registro inexistente. Criando com:',
+                initialValue
+            );
+
+            db.prepare(
+                'INSERT INTO gamification_points (patient_id, points) VALUES (?, ?)'
+            ).run(patient_id, initialValue);
+        }
     }
-}
 }
 
 module.exports = GamificationRepository;

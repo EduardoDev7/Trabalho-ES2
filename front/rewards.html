@@ -113,28 +113,57 @@
         </div>
     </main>
 
-    <script>
-        // Pega do localStorage pra ficar sincronizado com o dashboard
-        let myPoints = parseInt(localStorage.getItem('userPoints') || 0);
-        
-        // Se no dashboard a gente definiu um valor base, aqui mostra ele
-        // Vou forçar um update visual
-        document.getElementById('pointsDisplay').innerText = myPoints;
+   <script>
+        const API_URL = 'http://localhost:3000';
+        const token = localStorage.getItem('token');
+        let myPoints = 0;
 
-        function redeem(cost) {
+        // Se não houver token, redireciona para login
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+
+        // 1. Função para buscar os pontos reais do Banco de Dados
+        async function fetchUserPoints() {
+            try {
+                const response = await fetch(`${API_URL}/patient/points`, { 
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    myPoints = data.points;
+                    document.getElementById('pointsDisplay').innerText = myPoints;
+                }
+            } catch (error) {
+                console.error("Erro ao buscar pontos:", error);
+            }
+        }
+
+        // 2. Função para resgatar (idealmente chamaria uma API para descontar no banco)
+        async function redeem(cost) {
             if(myPoints >= cost) {
                 if(confirm('Tem certeza que quer gastar seus pontos?')) {
-                    alert('Parabéns! Cupom enviado pro seu email.');
-                    // Desconta só visualmente aqui, num app real chamaria API
+                    // Num app real, você faria um FETCH POST para /patient/spend-points
+                    alert('Parabéns! Cupom enviado para o seu e-mail.');
+                    
+                    // Atualização visual local (provisória)
                     myPoints -= cost;
                     document.getElementById('pointsDisplay').innerText = myPoints;
-                    // Atualiza no storage pro dashboard ver depois
+                    
+                    // Opcional: Salva no localStorage para o Dashboard ler imediatamente
                     localStorage.setItem('userPoints', myPoints);
                 }
             } else {
                 alert('Você precisa de mais pontos! Cumpra suas metas diárias.');
             }
         }
+
+        // Inicia a busca assim que a página carrega
+        fetchUserPoints();
     </script>
 </body>
 </html>

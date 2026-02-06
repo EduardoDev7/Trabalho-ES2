@@ -21,32 +21,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 1. FUNÇÕES DE API ---
 
-    // NOVO: Busca os pontos reais salvos no Banco de Dados
+    // CORRIGIDO: Busca os pontos reais salvos no Banco de Dados
     async function fetchUserPoints() {
-    try {
-        // Adicionamos um timestamp para evitar que o navegador use o cache antigo
-        const response = await fetch(`${API_URL}/patient/points?t=${new Date().getTime()}`, { 
-            headers: { 
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
+        console.log("🔄 Buscando pontos do servidor...");
+        try {
+            const response = await fetch(`${API_URL}/patient/points`, { 
+                method: 'GET',
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                cache: 'no-store' // Força a não usar cache
+            });
+            
+            console.log("📡 Status da resposta:", response.status);
+            
+            if (response.ok) {
+                const data = await response.json();
+                console.log("✅ Dados recebidos:", data);
+                
+                const ptsElement = document.getElementById('userPoints');
+                if (ptsElement) {
+                    ptsElement.textContent = data.points;
+                    console.log("✅ Pontos atualizados no DOM:", data.points);
+                } else {
+                    console.error("❌ Elemento 'userPoints' não encontrado!");
+                }
+            } else {
+                console.error("❌ Erro na resposta:", response.status, response.statusText);
+                const errorText = await response.text();
+                console.error("Detalhes do erro:", errorText);
             }
-        });
-        
-        if (response.ok) {
-            const data = await response.json();
-            const ptsElement = document.getElementById('userPoints');
-            if (ptsElement) {
-                // Forçamos a atualização do texto
-                ptsElement.innerText = data.points;
-                console.log("Pontos atualizados no DOM:", data.points);
-            }
+        } catch (error) {
+            console.error("❌ Erro ao buscar pontos:", error);
         }
-    } catch (error) {
-        console.error("Erro de conexão ao buscar pontos:", error);
     }
-}
 
     async function fetchRoutines() {
+        console.log("🔄 Buscando rotinas...");
         try {
             const resMeals = await fetch(`${ROUTINE_ENDPOINT}/meal?date=${today}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
@@ -59,13 +71,42 @@ document.addEventListener('DOMContentLoaded', () => {
             if (resExercises.ok) exerciseList = await resExercises.json();
 
             renderAll();
+            
+            // ✅ CORRIGIDO: Busca pontos DEPOIS de renderizar
+            await fetchUserPoints();
+            
         } catch (error) {
-            console.error("Erro ao buscar rotinas:", error);
+            console.error("❌ Erro ao buscar rotinas:", error);
+        }
+    }
+
+    async function saveRoutine(type, data) {
+        console.log(`💾 Salvando rotina de ${type}:`, data);
+        try {
+            const response = await fetch(`${ROUTINE_ENDPOINT}/${type}`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                console.log("✅ Rotina salva com sucesso!");
+                closeModal();
+                await fetchRoutines(); // Recarrega tudo, incluindo pontos
+            } else {
+                console.error("❌ Erro ao salvar rotina:", response.status);
+            }
+        } catch (error) {
+            console.error("❌ Erro ao salvar rotina:", error);
         }
     }
 
     window.toggleStatus = async function(type, id, currentStatus) {
         const method = currentStatus ? 'DELETE' : 'POST'; 
+        console.log(`🔄 Alterando status (${method}) para ${type} #${id}`);
         
         try {
             const response = await fetch(`${ROUTINE_ENDPOINT}/${type}/${id}/done`, {
@@ -78,9 +119,9 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (response.ok) {
-                // Sincroniza os pontos com o servidor após a mudança
-                await fetchUserPoints(); 
-
+                console.log("✅ Status atualizado com sucesso!");
+                
+                // Atualiza a lista local
                 if (type === 'meal') {
                     const item = mealList.find(m => m.id === id);
                     if(item) item.is_done = !currentStatus;
@@ -88,10 +129,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     const item = exerciseList.find(e => e.id === id);
                     if(item) item.is_done = !currentStatus;
                 }
-                renderAll(); 
+                
+                renderAll();
+                
+                // ✅ IMPORTANTE: Busca os pontos atualizados do servidor
+                await fetchUserPoints(); 
+            } else {
+                console.error("❌ Erro ao atualizar status:", response.status);
             }
         } catch (error) {
-            console.error("Erro ao atualizar status:", error);
+            console.error("❌ Erro ao atualizar status:", error);
         }
     };
 
@@ -103,11 +150,16 @@ document.addEventListener('DOMContentLoaded', () => {
         updateDashboardOverview();
     }
 
-    // (As funções renderMeals e renderExercises permanecem as mesmas que você enviou)
     function renderMeals() {
         const container = document.getElementById('mealList');
         if(!container) return;
         container.innerHTML = ''; 
+        
+        if (mealList.length === 0) {
+            container.innerHTML = '<p class="text-gray-500 text-center italic mt-4">Nenhuma refeição registrada hoje.</p>';
+            return;
+        }
+        
         mealList.forEach(meal => {
             const isDone = !!meal.is_done; 
             const div = document.createElement('div');
@@ -130,6 +182,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.getElementById('exerciseList');
         if(!container) return;
         container.innerHTML = '';
+        
+        if (exerciseList.length === 0) {
+            container.innerHTML = '<p class="text-gray-500 text-center italic mt-4">Nenhum exercício registrado hoje.</p>';
+            return;
+        }
+        
         exerciseList.forEach(ex => {
             const isDone = !!ex.is_done;
             const div = document.createElement('div');
@@ -152,8 +210,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const totalTasks = mealList.length + exerciseList.length;
         const tasksDoneNow = mealList.filter(m => m.is_done).length + exerciseList.filter(e => e.is_done).length;
 
-        // Note: O texto dos pontos é atualizado pela função fetchUserPoints()
-        
         let percentage = 0;
         if (totalTasks > 0) percentage = Math.round((tasksDoneNow / totalTasks) * 100);
 
@@ -232,6 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    fetchRoutines();
-    fetchUserPoints(); // Carrega os pontos do banco assim que entra
+    // ✅ INICIALIZAÇÃO
+    console.log("🚀 Iniciando dashboard...");
+    fetchRoutines(); // Isso já vai chamar fetchUserPoints() internamente
 });

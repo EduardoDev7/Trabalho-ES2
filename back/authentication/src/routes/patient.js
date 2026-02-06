@@ -61,7 +61,11 @@ router.post('/history', authMiddleware, (req, res) => {
 
 router.get('/points', authMiddleware, (req, res) => {
     try {
+        console.log('🧠 JWT payload:', req.user);
+
         const patient_id = req.user.id;
+        console.log('🎯 patient_id usado:', patient_id);
+
         const points = GamificationRepository.getPoints(patient_id);
         res.json({ points });
     } catch (error) {
@@ -69,5 +73,6 @@ router.get('/points', authMiddleware, (req, res) => {
         res.status(500).json({ error: "Erro interno ao buscar pontos." });
     }
 });
+
 
 module.exports = router;
