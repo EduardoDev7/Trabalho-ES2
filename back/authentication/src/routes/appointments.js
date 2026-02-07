@@ -10,8 +10,7 @@ const mwPath = fs.existsSync(path.resolve(__dirname, '../middleware/authMiddlewa
     : '../middlewares/authMiddleware';
 const authMiddleware = require(mwPath);
 
-//AGENDAR CONSULTA
-
+// AGENDAR CONSULTA
 router.post('/schedule', authMiddleware, (req, res) => {
     const { doctor_id, date, reason } = req.body;
     const patient_id = req.user.id;
@@ -28,19 +27,18 @@ router.post('/schedule', authMiddleware, (req, res) => {
     }
 });
 
-// PAINEL DO MÉDICO (CONSERTADO)
+// PAINEL DO MÉDICO (ATUALIZADO PARA TRAZER O LINK)
 router.get('/doctor', authMiddleware, (req, res) => {
     const doctorId = req.user.id; 
     
-    console.log("\n--- DEBUG PAINEL MÉDICO ---");
-    console.log("ID do Médico no Token:", doctorId);
-
     try {
         const getByStatus = (status) => db.prepare(`
             SELECT 
                 c.id, 
                 c.date, 
-                c.reason AS notes, 
+                c.reason,
+                c.notes, 
+                c.meet_link, -- Agora retorna o link salvo
                 c.patient_id, 
                 p.name AS patient_name
             FROM consultation c
@@ -52,9 +50,6 @@ router.get('/doctor', authMiddleware, (req, res) => {
         const pending = getByStatus('pending');
         const confirmed = getByStatus('confirmed');
 
-        console.log(`Sucesso: Encontradas ${pending.length} pendentes para o ID ${doctorId}`);
-        console.log("---------------------------\n");
-
         res.json({ pending, confirmed });
     } catch (error) {
         console.error("Erro no SQL:", error.message);
@@ -62,41 +57,57 @@ router.get('/doctor', authMiddleware, (req, res) => {
     }
 });
 
-// ATUALIZAR STATUS (CORRIGIDO)
+// ATUALIZAR STATUS
 router.patch('/:id/status', authMiddleware, (req, res) => {
     const { status } = req.body;
     const { id } = req.params;
     const doctorId = req.user.id;
-
-    console.log(`Tentando atualizar consulta ${id} para status ${status} (Médico: ${doctorId})`);
 
     try {
         const stmt = db.prepare("UPDATE consultation SET status = ? WHERE id = ? AND doctor_id = ?");
         const result = stmt.run(status, id, doctorId);
 
         if (result.changes === 0) {
-            console.log("Nenhuma linha alterada. Verifique se o ID da consulta e o ID do médico batem.");
-            return res.status(404).json({ error: 'Consulta não encontrada ou não pertence a este médico.' });
+            return res.status(404).json({ error: 'Consulta não encontrada ou sem permissão.' });
         }
-
         res.json({ message: 'Status atualizado com sucesso!' });
     } catch (error) {
-        console.error("Erro ao atualizar status:", error.message);
         res.status(500).json({ error: error.message });
     }
 });
 
+// SALVAR LINK DO MEET (CORRIGIDO)
 router.patch('/:id/link', authMiddleware, (req, res) => {
-    res.status(400).json({ error: 'A coluna meet_link não existe na tabela consultation.' });
+    const { meet_link } = req.body; // Recebe o link do frontend
+    const { id } = req.params;      // ID da consulta
+    const doctorId = req.user.id;   // ID do médico logado
+
+    try {
+        // Só permite atualizar se a consulta pertencer ao médico logado
+        const stmt = db.prepare(`
+            UPDATE consultation 
+            SET meet_link = ? 
+            WHERE id = ? AND doctor_id = ?
+        `);
+        const result = stmt.run(meet_link, id, doctorId);
+
+        if (result.changes === 0) {
+            return res.status(404).json({ error: 'Consulta não encontrada ou você não tem permissão para editá-la.' });
+        }
+
+        res.json({ message: 'Link do Meet salvo com sucesso!' });
+    } catch (error) {
+        console.error("Erro ao salvar link:", error.message);
+        res.status(500).json({ error: 'Erro interno ao salvar o link.' });
+    }
 });
 
-//PRONTUÁRIO
+// PRONTUÁRIO
 router.get('/patient/:id/history', authMiddleware, (req, res) => {
     try {
         const profile = db.prepare("SELECT * FROM patient_profiles WHERE patient_id = ?").get(req.params.id);
         res.json(profile || {});
     } catch (error) { 
-        console.log("Aviso: Tabela patient_profiles não encontrada.");
         res.json({}); 
     }
 });
