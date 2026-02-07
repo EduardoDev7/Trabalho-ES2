@@ -2,19 +2,35 @@ const jwt = require('jsonwebtoken');
 
 module.exports = (req, res, next) => {
     const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-
-    if (!token) {
-        return res.status(401).json({ error: 'Acesso negado. Faça login.' });
+    
+    // Verifica se o cabeçalho existe e se começa com "Bearer "
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        console.error("ERRO AUTH: Cabeçalho Authorization ausente ou fora do formato Bearer");
+        return res.status(401).json({ error: 'Acesso negado. Faça login novamente.' });
     }
 
+    const token = authHeader.split(' ')[1];
+
     try {
-        // Usa a chave secreta do seu .env ou uma padrão
+        // IMPORTANTE: Esta chave DEVE ser igual à do seu arquivo de login
         const secret = process.env.JWT_SECRET || 'sua_chave_secreta_aqui';
+        
         const decoded = jwt.verify(token, secret);
-        req.user = decoded; // Aqui ele salva o ID do paciente logado
+        
+        // Salva os dados no req.user para serem usados nas rotas
+        req.user = decoded; 
+        
         next();
     } catch (err) {
-        res.status(403).json({ error: 'Token inválido ou expirado.' });
+        // Exibe no terminal do servidor o motivo exato da falha
+        if (err.name === 'TokenExpiredError') {
+            console.error("ERRO AUTH: O token expirou em " + err.expiredAt);
+        } else if (err.name === 'JsonWebTokenError') {
+            console.error("ERRO AUTH: Assinatura inválida (Chave secreta pode estar diferente)");
+        } else {
+            console.error("ERRO AUTH:", err.message);
+        }
+
+        return res.status(403).json({ error: 'Sessão inválida ou expirada. Por favor, entre novamente.' });
     }
 };
