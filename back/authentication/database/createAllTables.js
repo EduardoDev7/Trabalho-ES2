@@ -21,7 +21,12 @@ CREATE TABLE IF NOT EXISTS patient (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   email TEXT NOT NULL UNIQUE,
   password TEXT NOT NULL,
-  name TEXT
+  name TEXT,
+  diabetes_type TEXT,
+  diagnosis_date TEXT,
+  allergies TEXT,
+  medications TEXT,
+  notes TEXT
 );
 
 CREATE TABLE IF NOT EXISTS doctor (
@@ -38,12 +43,10 @@ CREATE TABLE IF NOT EXISTS consultation (
   patient_id INTEGER NOT NULL,
   doctor_id INTEGER NOT NULL,
   date TEXT NOT NULL,
-  
   reason TEXT,                    
   status TEXT DEFAULT 'pending',  
-  
-  notes TEXT,                     
-  
+  notes TEXT, 
+  meet_link TEXT, 
   FOREIGN KEY (patient_id) REFERENCES patient(id),
   FOREIGN KEY (doctor_id) REFERENCES doctor(id)
 );
