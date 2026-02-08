@@ -124,11 +124,17 @@ router.patch('/:id/update', authMiddleware, (req, res) => {
     }
 });
 
+
 // 5. Histórico do Paciente (Prontuário)
 router.get('/patient/:id/history', authMiddleware, (req, res) => {
     try {
-        const profile = db.prepare("SELECT * FROM patient_profiles WHERE patient_id = ?").get(req.params.id);
-        res.json(profile || { message: "Nenhum perfil encontrado para este paciente." });
+        const profile = db.prepare("SELECT * FROM patient WHERE id = ?").get(req.params.id);
+        
+        if (!profile) {
+            return res.status(404).json({ message: "Nenhum perfil encontrado para este paciente." });
+        }
+
+        res.json(profile);
     } catch (error) { 
         console.error("Erro ao buscar histórico:", error.message);
         res.status(500).json({ error: 'Erro ao buscar histórico do paciente.' });
