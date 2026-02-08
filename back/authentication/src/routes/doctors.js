@@ -20,4 +20,26 @@ router.get('/', (req, res) => {
     }
 });
 
+router.get('/:id/history', authMiddleware, (req, res) => {
+    try {
+        const patientId = req.params.id;
+
+        const patient = db.prepare(`
+            SELECT diabetes_type, diagnosis_date, allergies, medications, notes 
+            FROM patient 
+            WHERE id = ?
+        `).get(patientId);
+
+        if (!patient) {
+            return res.status(404).json({ error: 'Paciente não encontrado.' });
+        }
+
+        res.json(patient);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erro ao buscar prontuário.' });
+    }
+});
+
+
 module.exports = router;

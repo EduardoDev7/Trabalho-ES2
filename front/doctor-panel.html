@@ -185,9 +185,10 @@
 
             try {
                 // Rota que vc vai criar no backend: GET /patient/:id/history
-                const res = await fetch(`${API_URL}/patient/${patientId}/history`, {
+                const res = await fetch(`${API_URL}/doctors/${patientId}/history`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
+
 
                 if(res.ok) {
                     const data = await res.json();
