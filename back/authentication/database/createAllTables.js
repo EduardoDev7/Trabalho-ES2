@@ -21,7 +21,8 @@ CREATE TABLE IF NOT EXISTS patient (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   email TEXT NOT NULL UNIQUE,
   password TEXT NOT NULL,
-  name TEXT
+  name TEXT,
+  diabetes_type TEXT, diagnosis_date TEXT, allergies TEXT, medications TEXT, notes TEXT
 );
 
 CREATE TABLE IF NOT EXISTS doctor (
