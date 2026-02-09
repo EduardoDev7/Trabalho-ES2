@@ -24,10 +24,10 @@ class MealRoutineRepository {
             ON pmr.id = mrc.routine_id 
             AND mrc.completion_date = ?
         WHERE pmr.patient_id = ? 
-          AND DATE(pmr.created_at) = ?  -- Filtra apenas as criadas no dia específico
+        -- Removemos a trava DATE(pmr.created_at) para que a rotina apareça sempre após ser criada
         ORDER BY pmr.id ASC;
     `;
-    return db.prepare(query).all(date_to_filter, patient_id, date_to_filter);
+    return db.prepare(query).all(date_to_filter, patient_id);
 }
 
     static markRoutineAsDone(routine_id, patient_id, completion_date) {
