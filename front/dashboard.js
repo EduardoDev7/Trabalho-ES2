@@ -14,7 +14,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const userName = localStorage.getItem('userName') || 'Usuário';
     document.getElementById('userName').innerText = userName;
 
-    const today = new Date().toISOString().split('T')[0];
+    const now = new Date();
+    const today = now.toLocaleDateString('sv-SE'); 
+
+    console.log("Data do Dashboard:", today);
 
     let mealList = [];
     let exerciseList = [];
