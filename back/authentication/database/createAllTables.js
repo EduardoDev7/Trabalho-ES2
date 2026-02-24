@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS consultation (
   patient_id INTEGER NOT NULL,
   doctor_id INTEGER NOT NULL,
   date TEXT NOT NULL,
+  time TEXT NOT NULL,           
   reason TEXT,                    
   status TEXT DEFAULT 'pending',  
   notes TEXT, 
@@ -46,7 +47,6 @@ CREATE TABLE IF NOT EXISTS consultation (
   FOREIGN KEY (patient_id) REFERENCES patient(id),
   FOREIGN KEY (doctor_id) REFERENCES doctor(id)
 );
-
 
 CREATE TABLE IF NOT EXISTS gamification_points (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
