@@ -12,21 +12,23 @@ const mwPath = fs.existsSync(path.resolve(__dirname, '../middleware/authMiddlewa
 const authMiddleware = require(mwPath);
 
 
-// 1. Agendar Consulta
+// 1. Agendar Consulta (ATUALIZADO COM TIME)
 router.post('/schedule', authMiddleware, (req, res) => {
-    const { doctor_id, date, reason } = req.body;
+    // Agora recebemos 'time' do corpo da requisição
+    const { doctor_id, date, time, reason } = req.body;
     const patient_id = req.user.id;
 
-    if (!doctor_id || !date) {
-        return res.status(400).json({ error: 'Médico e Data são obrigatórios.' });
+    if (!doctor_id || !date || !time) {
+        return res.status(400).json({ error: 'Médico, Data e Hora são obrigatórios.' });
     }
 
     try {
         const stmt = db.prepare(`
-            INSERT INTO consultation (patient_id, doctor_id, date, reason, status)
-            VALUES (?, ?, ?, ?, 'pending')
+            INSERT INTO consultation (patient_id, doctor_id, date, time, reason, status)
+            VALUES (?, ?, ?, ?, ?, 'pending')
         `);
-        const info = stmt.run(patient_id, doctor_id, date, reason);
+        // Incluindo o 'time' no salvamento
+        const info = stmt.run(patient_id, doctor_id, date, time, reason);
         
         res.status(201).json({ 
             id: info.lastInsertRowid, 
@@ -38,12 +40,14 @@ router.post('/schedule', authMiddleware, (req, res) => {
     }
 });
 
+// 2. Minhas Consultas - Paciente (ATUALIZADO COM TIME)
 router.get('/my-consultations', authMiddleware, (req, res) => {
     try {
         const consultations = db.prepare(`
             SELECT 
                 c.id, 
                 c.date, 
+                c.time, -- Adicionado aqui
                 c.reason, 
                 c.notes, 
                 c.status, 
@@ -52,7 +56,7 @@ router.get('/my-consultations', authMiddleware, (req, res) => {
             FROM consultation c
             JOIN doctor d ON c.doctor_id = d.id
             WHERE c.patient_id = ?
-            ORDER BY c.date DESC
+            ORDER BY c.date DESC, c.time DESC
         `).all(req.user.id);
 
         res.json(consultations);
@@ -62,7 +66,7 @@ router.get('/my-consultations', authMiddleware, (req, res) => {
     }
 });
 
-// 3. Painel de Consultas (Médico vê quem é o paciente e o link atual)
+// 3. Painel do Médico (ATUALIZADO COM TIME)
 router.get('/doctor-panel', authMiddleware, (req, res) => {
     const doctorId = req.user.id;
 
@@ -71,6 +75,7 @@ router.get('/doctor-panel', authMiddleware, (req, res) => {
             SELECT 
                 c.id, 
                 c.date, 
+                c.time, -- Adicionado aqui
                 c.reason, 
                 c.notes,
                 c.meet_link, 
@@ -79,7 +84,7 @@ router.get('/doctor-panel', authMiddleware, (req, res) => {
             FROM consultation c
             JOIN patient p ON c.patient_id = p.id
             WHERE c.doctor_id = ? AND c.status = ?
-            ORDER BY c.date ASC
+            ORDER BY c.date ASC, c.time ASC
         `).all(doctorId, status);
 
         res.json({ 
@@ -92,21 +97,19 @@ router.get('/doctor-panel', authMiddleware, (req, res) => {
     }
 });
 
-// 4. Atualizar Status e Adicionar Link 
+// 4. Atualizar Status e Link (Continua igual, mas pronto para o novo banco)
 router.patch('/:id/update', authMiddleware, (req, res) => {
     const { status, meet_link, notes } = req.body;
     const { id } = req.params;
     const doctorId = req.user.id;
 
     try {
-        // Verifica se a consulta pertence ao médico que está tentando editar
         const check = db.prepare("SELECT id FROM consultation WHERE id = ? AND doctor_id = ?").get(id, doctorId);
         
         if (!check) {
             return res.status(403).json({ error: 'Acesso negado ou consulta não encontrada.' });
         }
 
-        // Constrói o update dinamicamente conforme o que foi enviado
         if (status) {
             db.prepare("UPDATE consultation SET status = ? WHERE id = ?").run(status, id);
         }
@@ -124,8 +127,7 @@ router.patch('/:id/update', authMiddleware, (req, res) => {
     }
 });
 
-
-// 5. Histórico do Paciente (Prontuário)
+// 5. Histórico do Paciente
 router.get('/patient/:id/history', authMiddleware, (req, res) => {
     try {
         const profile = db.prepare("SELECT * FROM patient WHERE id = ?").get(req.params.id);
