@@ -157,7 +157,6 @@
 
 # Diagrama de Caso de Uso
 
-<img width="626" height="572" alt="Captura de Tela 2025-12-10 às 11 25 32" src="https://github.com/user-attachments/assets/327da682-5ea0-4f97-a17a-3a6c5df93b17" />
-
+<img width="619" height="575" alt="Captura de Tela 2026-02-24 às 16 58 02" src="https://github.com/user-attachments/assets/6b2fdf23-592a-4484-b173-00e6bce7fd6a" />
 
 
