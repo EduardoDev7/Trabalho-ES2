@@ -4,34 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Consultas - GlicoGame</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        darkBg: '#120E29', cardBg: '#1E1B3A', accentPurple: '#7C3AED', accentPink: '#EC4899', accentCyan: '#06B6D4'
+                        darkBg: '#120E29', 
+                        cardBg: '#1E1B3A', 
+                        accentPurple: '#7C3AED', 
+                        accentPink: '#EC4899', 
+                        accentCyan: '#06B6D4'
                     }
                 }
             }
         }
     </script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
     <style>
         body { font-family: 'Inter', sans-serif; }
+        
+        /* Fundo padrão do sistema */
         .bg-main-gradient { background: linear-gradient(135deg, #120E29 0%, #2E1065 100%); }
-        .glass-card { background: rgba(30, 27, 58, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        
+        /* Efeito de vidro chique */
+        .glass-card { 
+            background: rgba(30, 27, 58, 0.7); 
+            backdrop-filter: blur(10px); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+        }
+        
+        /* Estilos pro sistema de abas */
         .tab-active { border-bottom: 2px solid #06B6D4; color: #06B6D4; }
         .tab-inactive { color: #9CA3AF; }
+        
+        /* Animaçãozinha suave */
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="bg-main-gradient h-screen flex flex-col text-gray-100 overflow-hidden">
 
     <header class="p-6 flex justify-between items-center bg-[#161330]/80 border-b border-white/10 backdrop-blur-md z-10">
-        <h1 class="text-2xl font-bold text-white">Área de <span id="headerUserName" class="text-accentCyan">Saúde</span> 🩺</h1>
-        <a href="dashboard.html" class="flex items-center gap-2 text-sm text-gray-300 hover:text-white transition bg-white/5 px-4 py-2 rounded-full border border-white/10">
-            <span>← Voltar</span>
+        <h1 class="text-2xl font-bold text-white">Área de <span class="text-accentCyan">Saúde</span> 🩺</h1>
+        <a href="dashboard.html" class="flex items-center gap-2 text-sm text-gray-300 hover:text-white transition bg-white/5 px-4 py-2 rounded-full border border-white/10 hover:bg-white/10">
+            <span>← Voltar pro Painel</span>
         </a>
     </header>
 
@@ -49,28 +71,30 @@
 
             <div id="content-search" class="fade-in">
                 <p class="text-gray-400 mb-6">Profissionais disponíveis na plataforma:</p>
+                
                 <div id="doctorsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <p class="text-gray-500 col-span-3 text-center py-10">Carregando lista de especialistas...</p>
+                    <p class="text-gray-500 col-span-3 text-center py-10 animate-pulse">Carregando lista de especialistas...</p>
                 </div>
             </div>
 
             <div id="content-my-appointments" class="hidden fade-in">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div class="glass-card p-6 rounded-2xl">
+                    
+                    <div class="glass-card p-6 rounded-3xl">
                         <h3 class="text-lg font-bold text-yellow-500 mb-4 flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-yellow-500"></span> Aguardando Confirmação
+                            <span class="w-3 h-3 rounded-full bg-yellow-500 animate-pulse"></span> Aguardando Confirmação
                         </h3>
-                        <div id="pendingList" class="space-y-3">
-                            <p class="text-sm text-gray-500 italic">Carregando...</p>
+                        <div id="pendingList" class="space-y-4">
+                            <p class="text-sm text-gray-500 italic text-center py-4">Nenhuma solicitação pendente.</p>
                         </div>
                     </div>
 
-                    <div class="glass-card p-6 rounded-2xl">
+                    <div class="glass-card p-6 rounded-3xl">
                         <h3 class="text-lg font-bold text-accentCyan mb-4 flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-accentCyan"></span> Consultas Agendadas
+                            <span class="w-3 h-3 rounded-full bg-accentCyan"></span> Consultas Agendadas
                         </h3>
-                        <div id="confirmedList" class="space-y-3">
-                            <p class="text-sm text-gray-500 italic">Carregando...</p>
+                        <div id="confirmedList" class="space-y-4">
+                            <p class="text-sm text-gray-500 italic text-center py-4">Nenhuma consulta confirmada.</p>
                         </div>
                     </div>
                 </div>
@@ -81,40 +105,44 @@
 
     <div id="scheduleModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeModal()"></div>
-        <div class="glass-card w-full max-w-md p-8 rounded-3xl relative z-10 border border-white/20 shadow-2xl">
-            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">✕</button>
-            <h3 class="text-2xl font-bold mb-1 text-white">Agendar</h3>
+        
+        <div class="glass-card w-full max-w-md p-8 rounded-3xl relative z-10 border border-white/20 shadow-2xl fade-in">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition text-xl">✕</button>
+            
+            <h3 class="text-2xl font-bold mb-1 text-white">Agendar Consulta</h3>
             <p class="text-sm text-gray-400 mb-6">Médico: <span id="doctorNameDisplay" class="text-accentCyan font-bold">...</span></p>
             
             <form id="appointmentForm" class="space-y-4">
                 <input type="hidden" id="selectedDoctorId">
-                <div>
-                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Data</label>
-                    <input type="date" id="appDate" required class="w-full bg-[#120E29] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-accentCyan outline-none">
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Data</label>
+                        <input type="date" id="appDate" required class="w-full bg-[#120E29] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-accentCyan outline-none transition cursor-pointer">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Hora</label>
+                        <input type="time" id="appTime" required class="w-full bg-[#120E29] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-accentCyan outline-none transition cursor-pointer">
+                    </div>
                 </div>
+
                 <div>
-                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Motivo</label>
-                    <textarea id="appNotes" rows="3" placeholder="Ex: Dor de cabeça frequente..." class="w-full bg-[#120E29] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-accentCyan outline-none"></textarea>
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Motivo / Observações</label>
+                    <textarea id="appNotes" rows="3" placeholder="Ex: Ajuste de dosagem, primeira consulta..." class="w-full bg-[#120E29] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-accentCyan outline-none transition"></textarea>
                 </div>
-                <button type="submit" class="w-full py-3 rounded-xl bg-accentCyan hover:bg-cyan-400 text-white font-bold transition">Confirmar</button>
+                
+                <button type="submit" class="w-full py-4 mt-2 rounded-xl bg-gradient-to-r from-cyan-600 to-accentCyan hover:from-cyan-500 hover:to-cyan-400 text-white font-bold transition shadow-lg shadow-cyan-500/30 transform hover:-translate-y-1 active:scale-95">
+                    Confirmar Agendamento
+                </button>
             </form>
         </div>
     </div>
 
     <script>
-        const API_URL = 'http://localhost:3000'; 
+        const API_URL = 'http://localhost:3000'; // Ajusta se o teu back tiver em outra porta
         const token = localStorage.getItem('token');
-        const userName = localStorage.getItem('userName'); // Pega o nome do paciente
 
-        // Força o nome do paciente no header ao carregar
-        if (userName) {
-            document.getElementById('headerUserName').innerText = userName;
-        }
-
-        if (!token) {
-            window.location.href = "login.html"; 
-        }
-
+        // --- SISTEMA DE ABAS ---
         function switchTab(tab) {
             const searchContent = document.getElementById('content-search');
             const myContent = document.getElementById('content-my-appointments');
@@ -124,115 +152,191 @@
             if(tab === 'search') {
                 searchContent.classList.remove('hidden');
                 myContent.classList.add('hidden');
-                tabSearch.className = "pb-3 px-2 font-bold transition tab-active";
-                tabMy.className = "pb-3 px-2 font-bold transition tab-inactive hover:text-gray-300";
-                loadDoctors(); 
+                
+                tabSearch.classList.add('tab-active', 'text-accentCyan');
+                tabSearch.classList.remove('tab-inactive', 'text-gray-400');
+                
+                tabMy.classList.remove('tab-active', 'text-accentCyan');
+                tabMy.classList.add('tab-inactive');
+                
+                loadDoctors(); // Puxa os docs do back
             } else {
                 searchContent.classList.add('hidden');
                 myContent.classList.remove('hidden');
-                tabSearch.className = "pb-3 px-2 font-bold transition tab-inactive";
-                tabMy.className = "pb-3 px-2 font-bold transition tab-active text-accentCyan";
-                loadMyAppointments(); 
+                
+                tabSearch.classList.remove('tab-active');
+                tabSearch.classList.add('tab-inactive');
+                
+                tabMy.classList.add('tab-active', 'text-accentCyan');
+                tabMy.classList.remove('tab-inactive');
+                
+                loadMyAppointments(); // Puxa as consultas do back
             }
         }
 
+        // --- LISTAR MÉDICOS DO BANCO ---
         async function loadDoctors() {
             try {
+                // Rota que vc vai criar: GET /doctors
                 const res = await fetch(`${API_URL}/doctors`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
+                
                 const grid = document.getElementById('doctorsGrid');
-                grid.innerHTML = '';
+                grid.innerHTML = ''; // Limpa o "carregando..."
 
                 if(res.ok) {
                     const doctors = await res.json();
+                    
+                    if(doctors.length === 0) {
+                        grid.innerHTML = '<p class="text-gray-500 col-span-3 text-center py-10">Nenhum médico cadastrado ainda. Volte mais tarde!</p>';
+                        return;
+                    }
+
                     doctors.forEach(doc => {
                         const card = document.createElement('div');
-                        card.className = 'glass-card p-6 rounded-2xl hover:border-accentCyan/50 transition duration-300 flex flex-col items-center text-center';
+                        card.className = 'glass-card p-6 rounded-3xl hover:border-accentCyan/50 transition duration-300 flex flex-col items-center text-center group';
+                        // Usei o UI Avatars pra gerar uma fotinha default com as iniciais do nome
                         card.innerHTML = `
-                            <div class="w-20 h-20 rounded-full bg-gray-700 mb-4 overflow-hidden border-2 border-accentCyan/30">
-                                <img src="https://ui-avatars.com/api/?name=${doc.name}&background=0D8ABC&color=fff" class="w-full h-full object-cover">
+                            <div class="w-20 h-20 rounded-full bg-gray-700 mb-4 overflow-hidden border-2 border-accentCyan/30 group-hover:scale-105 transition">
+                                <img src="https://ui-avatars.com/api/?name=${doc.name}&background=0D8ABC&color=fff&size=150" class="w-full h-full object-cover">
                             </div>
                             <h3 class="text-xl font-bold text-white">${doc.name}</h3>
-                            <span class="text-xs bg-accentCyan/10 text-accentCyan px-2 py-1 rounded mt-1">${doc.especialidade || 'Clínico Geral'}</span>
-                            <p class="text-gray-400 text-xs mt-2">CRM: ${doc.crm || '---'}</p>
-                            <button onclick="openModal('${doc.id}', '${doc.name}')" class="mt-4 w-full py-2 bg-accentCyan/20 text-accentCyan border border-accentCyan/50 rounded-lg hover:bg-accentCyan hover:text-white transition font-bold text-sm">
-                                Agendar
+                            <span class="text-xs bg-accentCyan/10 text-accentCyan border border-accentCyan/20 px-3 py-1 rounded-full mt-2 font-bold uppercase tracking-wide">${doc.especialidade}</span>
+                            <p class="text-gray-400 text-xs mt-3 bg-white/5 px-2 py-1 rounded">CRM: ${doc.crm}</p>
+                            
+                            <button onclick="openModal('${doc.id}', '${doc.name}')" class="mt-6 w-full py-3 bg-accentCyan/10 text-accentCyan border border-accentCyan/50 rounded-xl hover:bg-accentCyan hover:text-white transition font-bold text-sm shadow-lg shadow-cyan-500/5">
+                                Agendar Horário
                             </button>
                         `;
                         grid.appendChild(card);
                     });
+                } else {
+                    grid.innerHTML = '<p class="text-red-400 col-span-3 text-center py-10">Erro ao carregar médicos do servidor.</p>';
                 }
-            } catch (err) { console.error(err); }
+            } catch (err) {
+                console.error("Erro ao carregar médicos:", err);
+                document.getElementById('doctorsGrid').innerHTML = '<p class="text-red-400 col-span-3 text-center py-10">Erro de conexão com o banco de dados.</p>';
+            }
         }
 
+        // --- LISTAR MINHAS CONSULTAS ---
         async function loadMyAppointments() {
             try {
-                const res = await fetch(`${API_URL}/consultations/my-consultations`, {
+                // Rota que vc vai criar: GET /appointments/patient
+                const res = await fetch(`${API_URL}/appointments/patient`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
                 if(res.ok) {
-                    const allConsultations = await res.json(); 
+                    const data = await res.json(); 
+                    
                     const pendingDiv = document.getElementById('pendingList');
                     const confirmedDiv = document.getElementById('confirmedList');
+                    
                     pendingDiv.innerHTML = '';
                     confirmedDiv.innerHTML = '';
 
-                    allConsultations.forEach(app => {
-                        if(app.status === 'pending') {
+                    // Renderezia Pendentes
+                    if(data.pending.length > 0) {
+                        data.pending.forEach(app => {
                             pendingDiv.innerHTML += `
-                                <div class="p-3 bg-[#120E29]/50 rounded-lg border border-white/5 mb-2 hover:bg-[#1E1B3A] transition">
-                                    <p class="font-bold text-white">${app.doctor_name}</p>
-                                    <p class="text-sm text-accentCyan">${app.date}</p>
-                                    <p class="text-xs text-gray-400 mt-1">"${app.reason || 'Sem motivo'}"</p>
+                                <div class="p-4 bg-[#120E29]/50 rounded-xl border border-white/5 hover:border-yellow-500/30 transition">
+                                    <p class="font-bold text-white text-lg">${app.doctor_name}</p>
+                                    <p class="text-sm text-yellow-500/80 mt-1 flex items-center gap-2">
+                                        🗓️ ${app.date}
+                                    </p>
+                                    <p class="text-xs text-gray-500 mt-2 italic bg-black/20 p-2 rounded">"${app.notes || 'Sem observações'}"</p>
                                 </div>
                             `;
-                        } else if(app.status === 'confirmed') {
-                            // ALTERAÇÃO 2: Exibe o link se existir
-                            const meetHtml = app.meet_link 
-                                ? `<a href="${app.meet_link}" target="_blank" class="mt-3 block w-full py-2 bg-accentCyan text-white text-center rounded-lg font-bold text-xs hover:bg-cyan-400 transition">Entrar na Reunião</a>`
-                                : `<p class="text-[10px] text-gray-500 mt-2 italic">Aguardando link do médico...</p>`;
+                        });
+                    } else { pendingDiv.innerHTML = '<p class="text-sm text-gray-500 italic text-center py-4">Nenhuma solicitação pendente.</p>'; }
+
+                    // Renderiza Confirmados
+                    if(data.confirmed.length > 0) {
+                        data.confirmed.forEach(app => {
+                            // Gambiarra do bem: Se tiver link, vira um botão verde. Se não, fica um aviso cinza.
+                            const linkBtn = app.meet_link 
+                                ? `<a href="${app.meet_link}" target="_blank" class="block text-center mt-3 bg-green-500/20 text-green-400 py-2 rounded-lg border border-green-500/30 hover:bg-green-500 hover:text-white text-sm font-bold transition shadow-lg shadow-green-500/10">Entrar na Videoconferência 🎥</a>`
+                                : `<span class="block text-center mt-3 text-xs text-gray-400 border border-white/10 bg-black/30 rounded py-2">Link do Meet ainda não disponibilizado</span>`;
 
                             confirmedDiv.innerHTML += `
-                                <div class="p-4 bg-[#120E29]/50 rounded-lg border-l-4 border-accentCyan mb-2">
-                                    <p class="font-bold text-white">${app.doctor_name}</p>
-                                    <p class="text-sm text-accentCyan font-bold">${app.date}</p>
-                                    ${meetHtml}
+                                <div class="p-5 bg-[#120E29]/50 rounded-xl border-l-4 border-accentCyan hover:bg-[#120E29] transition shadow-lg shadow-cyan-500/5">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <p class="font-bold text-white text-lg">${app.doctor_name}</p>
+                                            <p class="text-sm text-accentCyan mt-1 font-semibold">${app.date}</p>
+                                        </div>
+                                        <span class="text-xs bg-cyan-900/50 text-cyan-300 border border-cyan-500/30 px-2 py-1 rounded">Confirmada</span>
+                                    </div>
+                                    ${linkBtn}
                                 </div>
                             `;
-                        }
-                    });
+                        });
+                    } else { confirmedDiv.innerHTML = '<p class="text-sm text-gray-500 italic text-center py-4">Nenhuma consulta na agenda.</p>'; }
                 }
-            } catch (err) { console.error(err); }
+            } catch (err) {
+                console.error("Erro minhas consultas:", err);
+            }
         }
 
+        // --- CONTROLE DO MODAL DE AGENDAMENTO ---
+        const modal = document.getElementById('scheduleModal');
+        
         function openModal(id, name) {
             document.getElementById('selectedDoctorId').value = id;
             document.getElementById('doctorNameDisplay').innerText = name;
-            document.getElementById('scheduleModal').classList.remove('hidden');
+            modal.classList.remove('hidden');
+        }
+        
+        function closeModal() { 
+            modal.classList.add('hidden'); 
         }
 
-        function closeModal() { document.getElementById('scheduleModal').classList.add('hidden'); }
-
+        // --- ENVIAR SOLICITAÇÃO ---
         document.getElementById('appointmentForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const doctor_id = document.getElementById('selectedDoctorId').value;
+            
+            const doctorId = document.getElementById('selectedDoctorId').value;
             const date = document.getElementById('appDate').value;
-            const reason = document.getElementById('appNotes').value;
+            const time = document.getElementById('appTime').value; // Pegando a hora!
+            const notes = document.getElementById('appNotes').value;
 
-            const res = await fetch(`${API_URL}/consultations/schedule`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify({ doctor_id, date, reason })
-            });
+            // Junta a data e a hora pra salvar bonito no banco
+            const fullDateTime = `${date} ${time}`;
 
-            if(res.ok) {
-                closeModal();
-                switchTab('my-appointments'); 
+            try {
+                // Rota que vc vai criar: POST /appointments
+                const res = await fetch(`${API_URL}/appointments`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ doctor_id: doctorId, date: fullDateTime, notes })
+                });
+
+                if(res.ok) {
+                    alert('Show! Solicitação enviada. O médico vai avaliar e logo aparece na aba Minhas Consultas.');
+                    closeModal();
+                    
+                    // Limpando o form pro próximo uso
+                    document.getElementById('appDate').value = '';
+                    document.getElementById('appTime').value = '';
+                    document.getElementById('appNotes').value = '';
+
+                    // Redireciona o cara pra aba de acompanhamento automaticamente
+                    switchTab('my-appointments'); 
+                } else {
+                    alert('Deu ruim ao tentar agendar. Tente novamente.');
+                }
+            } catch(err) {
+                console.error(err);
+                alert('Erro de conexão com o servidor.');
             }
         });
 
+        // Quando a página carrega, já puxa os médicos
         loadDoctors();
     </script>
 </body>
