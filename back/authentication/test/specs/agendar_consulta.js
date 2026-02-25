@@ -33,6 +33,6 @@ describe('Funcionalidade de Médicos - GlicoGame', () => {
         // Pausa para você visualizar o resultado na tela
         await browser.pause(3000)
         
-        console.log('✅ Consulta agendada e verificada com sucesso!')
+        console.log('Consulta agendada e verificada com sucesso!')
     })
 })
