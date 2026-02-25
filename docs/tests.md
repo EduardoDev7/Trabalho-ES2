@@ -46,7 +46,7 @@ Todos os testes foram rodados via terminal e apresentaram **100% de sucesso (Pas
 ## 5. Conclusão
 Os testes automatizados confirmaram que as funções estão funcionando perfeitamente. Os IDs dos elementos HTML responderam corretamente e o sistema de rotas entre as páginas está estável, garantindo que o usuário consiga gerenciar sua saúde no GlicoGame de forma confiável.
 
-## 6. Demonstração da Interface (Screenshots)
+## 6. Demonstração da Interface 
 
 ### 6.1 Acesso ao Sistema
 **Tela de Login**
