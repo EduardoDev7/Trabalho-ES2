@@ -45,3 +45,52 @@ Todos os testes foram rodados via terminal e apresentaram **100% de sucesso (Pas
 
 ## 5. Conclusão
 Os testes automatizados confirmaram que as funções estão funcionando perfeitamente. Os IDs dos elementos HTML responderam corretamente e o sistema de rotas entre as páginas está estável, garantindo que o usuário consiga gerenciar sua saúde no GlicoGame de forma confiável.
+
+## 6. Demonstração da Interface (Screenshots)
+
+### 6.1 Acesso ao Sistema
+**Tela de Login**
+![Tela de Login](./prints/1_login.png)
+
+**Cadastro de Paciente**
+![Criar Conta Paciente](./prints/2_cadastro_paciente.png)
+
+**Cadastro de Médico**
+![Criar Conta Médico](./prints/3_cadastro_medico.png)
+
+---
+
+### 6.2 Área do Paciente (Gamificação e Controle)
+**Painel Principal (Dashboard)**
+![Tela Principal](./prints/4_dashboard.png)
+
+**Atualização de Prontuário**
+![Atualizar Prontuário](./prints/5_prontuario.png)
+
+**Histórico de Saúde**
+![Histórico do Paciente](./prints/6_historico.png)
+
+---
+
+### 6.3 Consultas e Recompensas
+**Agendamento de Consulta**
+![Agendar Consulta](./prints/7_agendar.png)
+
+**Minhas Consultas (Visão do Paciente)**
+![Consultas Agendadas](./prints/8_minhas_consultas.png)
+
+**Loja de Recompensas**
+![Loja de Recompensas](./prints/9_loja.png)
+
+---
+
+### 6.4 Visão do Profissional
+**Painel do Médico (Consultas Disponíveis)**
+![Consultas do Médico](./prints/10_visao_medico.png)
+
+---
+
+## 2. Verificação e Validação (Testes Automatizados)
+
+### 🚀 Evidência de Execução (Terminal)
+![Resultado dos Testes Automatizados](./prints/resultado_terminal.png)
