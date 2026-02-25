@@ -88,9 +88,4 @@ Os testes automatizados confirmaram que as funções estão funcionando perfeita
 **Painel do Médico (Consultas Disponíveis)**
 ![Consultas do Médico](./prints/10_visao_medico.png)
 
----
 
-## 2. Verificação e Validação (Testes Automatizados)
-
-### 🚀 Evidência de Execução (Terminal)
-![Resultado dos Testes Automatizados](./prints/resultado_terminal.png)
