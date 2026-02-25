@@ -1,7 +1,7 @@
 # Relatório de Testes Automatizados - GlicoGame
 
 ## 1. Introdução
-Este documento apresenta os testes realizados para a validação do sistema **GlicoGame**, desenvolvido com foco no **ODS 3 (Saúde e Bem-Estar)**. Para garantir a qualidade do software, utilizei testes de interface (E2E) que simulam a jornada do usuário real dentro da plataforma.
+Este documento apresenta os testes realizados para a validação do sistema **GlicoGame**, utilizando testes de interface (E2E) que simulam a jornada do usuário real dentro da plataforma.
 
 ## 2. Metodologia e Ferramentas
 Como estudante, optei pelo framework **WebdriverIO** em conjunto com **Node.js** e **JavaScript**. Essa escolha foi feita por permitir uma automação rápida e integrada ao navegador Google Chrome.
