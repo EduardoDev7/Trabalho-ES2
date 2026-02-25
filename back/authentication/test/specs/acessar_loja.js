@@ -29,6 +29,6 @@ describe('Funcionalidade da Loja - GlicoGame', () => {
         await expect(browser).toHaveUrl(expect.stringContaining('dashboard.html'))
         
         await browser.pause(2000)
-        console.log('✅ Visita à loja concluída com sucesso!')
+        console.log('Visita à loja concluída com sucesso!')
     })
 })
